@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Painel Administrativo - Loja Shalom</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef3f9;
+            color: #222;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           CABEÇALHO
+        ========================= */
+
+        header {
+            background: #0d47a1;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        header p {
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .btn-sair {
+            background: #e53935;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-sair:hover {
+            background: #c62828;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 25px auto;
+        }
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        .resumo {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .resumo-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+            text-align: center;
+        }
+
+        .resumo-card h3 {
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .resumo-card strong {
+            display: block;
+            font-size: 25px;
+            color: #0d47a1;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #111;
+        }
+
+        /* =========================
+           FORMULÁRIOS
+        ========================= */
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 12px 0 7px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-principal {
+            background: #1976d2;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-principal:hover {
+            background: #0d47a1;
+        }
+
+        .btn-cancelar {
+            background: #777;
+            color: white;
+            margin-top: 15px;
+            margin-left: 8px;
+        }
+
+        .btn-editar {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-excluir {
+            background: #e53935;
+            color: white;
+        }
+
+        /* =========================
+           PRODUTOS
+        ========================= */
+
+        .produto {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .produto-info strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .produto-info span {
+            color: #555;
+        }
+
+        .acoes {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* =========================
+           DEPÓSITOS
+        ========================= */
+
+        .deposito {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            background: #fafafa;
+        }
+
+        .deposito strong {
+            color: #16813d;
+            font-size: 19px;
+        }
+
+        .deposito small {
+            color: #777;
+        }
+
+        #mensagemDeposito {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* =========================
+           CLIENTES
+        ========================= */
+
+        .cliente {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .vazio {
+            color: #777;
+            padding: 10px 0;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        /* =========================
+           RESPONSIVO
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .resumo {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .resumo {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                align-items: flex-start;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- =========================
+         PROTEÇÃO DO ADMIN
+    ========================= -->
+
+    <script>
+
+        if (
+            localStorage.getItem("tipoUsuario") !== "admin"
+        ) {
+
+            window.location.href = "login.html";
+
+        }
+
+    </script>
+
+
+    <!-- =========================
+         CABEÇALHO
+    ========================= -->
+
+    <header>
+
+        <div>
+
+            <h1>
+                📦 Loja Shalom
+            </h1>
+
+            <p>
+                Painel Administrativo
+            </p>
+
+        </div>
+
+
+        <button
+            class="btn-sair"
+            onclick="sair()"
+        >
+            🚪 Sair
+        </button>
+
+    </header>
+
+
+    <main class="container">
+
+
+        <!-- =========================
+             RESUMO
+        ========================= -->
+
+        <section class="resumo">
+
+            <div class="resumo-card">
+
+                <h3>
+                    💰 Saldo
+                </h3>
+
+                <strong id="saldo">
+                    R$ 0,00
+                </strong>
+
+            </div>
+
+
+            <div class="resumo-card">
+
+                <h3>
+                    📦 Produtos
+                </h3>
+
+                <strong id="totalProdutos">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumo-card">
+
+                <h3>
+                    👥 Clientes
+                </h3>
+
+                <strong id="totalClientes">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="resumo-card">
+
+                <h3>
+                    💰 Depósitos
+                </h3>
+
+                <strong id="totalDepositos">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             DEPÓSITO
+        ========================= -->
+
+        <section class="card">
+
+            <h2>
+                💰 Registrar depósito
+            </h2>
+
+
+            <label for="valorDeposito">
+                Valor do depósito
+            </label>
+
+            <input
+                type="number"
+                id="valorDeposito"
+                min="0.01"
+                step="0.01"
+                placeholder="Ex: 50"
+            >
+
+
+            <label for="descricaoDeposito">
+                Descrição
+            </label>
+
+            <input
+                type="text"
+                id="descricaoDeposito"
+                placeholder="Ex: venda, caixa, dinheiro..."
+            >
+
+
+            <button
+                type="button"
+                class="btn-principal"
+                onclick="registrarDeposito()"
+            >
+                + Registrar depósito
+            </button>
+
+
+            <p id="mensagemDeposito"></p>
+
+        </section>
+
+
+        <!-- =========================
+             HISTÓRICO
+        ========================= -->
+
+        <section class="card">
+
+            <h2>
+                📋 Histórico de depósitos
+            </h2>
+
+            <div id="listaDepositos">
+
+                <p class="vazio">
+                    Nenhum depósito registrado.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PRODUTOS
+        ========================= -->
+
+        <section class="card">
+
+            <h2>
+                📦 Gerenciar produtos
+            </h2>
+
+
+            <button
+                type="button"
+                class="btn-principal"
+                onclick="abrirFormularioProduto()"
+            >
+                + Novo produto
+            </button>
+
+
+            <div
+                id="formularioProduto"
+                class="oculto"
+            >
+
+                <input
+                    type="hidden"
+                    id="produtoId"
+                >
+
+
+                <label for="nomeProduto">
+                    Nome do produto
+                </label>
+
+                <input
+                    type="text"
+                    id="nomeProduto"
+                    placeholder="Nome do produto"
+                >
+
+
+                <label for="precoProduto">
+                    Preço
+                </label>
+
+                <input
+                    type="number"
+                    id="precoProduto"
+                    min="0"
+                    step="0.01"
+                    placeholder="0,00"
+                >
+
+
+                <label for="estoqueProduto">
+                    Estoque
+                </label>
+
+                <input
+                    type="number"
+                    id="estoqueProduto"
+                    min="0"
+                    step="1"
+                    placeholder="Quantidade"
+                >
+
+
+                <label for="imagemProduto">
+                    Imagem do produto
+                </label>
+
+                <input
+                    type="text"
+                    id="imagemProduto"
+                    placeholder="URL da imagem"
+                >
+
+
+                <button
+                    type="button"
+                    class="btn-principal"
+                    onclick="salvarProduto()"
+                >
+                    💾 Salvar produto
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn-cancelar"
+                    onclick="fecharFormularioProduto()"
+                >
+                    Cancelar
+                </button>
+
+            </div>
+
+
+            <div id="listaProdutos">
+
+                <p class="vazio">
+                    Nenhum produto cadastrado.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             CLIENTES
+        ========================= -->
+
+        <section class="card">
+
+            <h2>
+                👥 Clientes cadastrados
+            </h2>
+
+            <div id="listaClientes">
+
+                <p class="vazio">
+                    Nenhum cliente cadastrado.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script src="admin.js"></script>
+
+
+</body>
+
+</html>

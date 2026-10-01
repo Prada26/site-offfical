@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login Administrativo - Loja Shalom</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                135deg,
+                #eaf3ff,
+                #d7e8ff
+            );
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.15);
+
+            border: 1px solid #c8dcff;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+
+            margin: 0 auto 15px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 50%;
+
+            background: #1473ff;
+
+            font-size: 38px;
+        }
+
+        h1 {
+            text-align: center;
+
+            color: #0d47a1;
+
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            text-align: center;
+
+            color: #777;
+
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+
+            margin-top: 16px;
+            margin-bottom: 7px;
+
+            color: #0645a5;
+
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 14px;
+
+            border: 2px solid #b9d3ff;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1473ff;
+        }
+
+        button {
+            width: 100%;
+
+            margin-top: 30px;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #1473ff;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d5fd8;
+        }
+
+        #mensagem {
+            text-align: center;
+
+            margin-top: 15px;
+
+            font-weight: bold;
+        }
+
+        .voltar {
+            display: block;
+
+            margin-top: 25px;
+
+            text-align: center;
+
+            color: #0066ff;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-box">
+
+
+    <div class="logo">
+        📦
+    </div>
+
+
+    <h1>
+        Loja Shalom
+    </h1>
+
+
+    <div class="subtitulo">
+        Painel Administrativo
+    </div>
+
+
+    <form id="acessoForm">
+
+
+        <label for="email">
+            E-mail
+        </label>
+
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Digite seu e-mail"
+            autocomplete="username"
+            required
+        >
+
+
+        <label for="senha">
+            Senha
+        </label>
+
+
+        <input
+            type="password"
+            id="senha"
+            placeholder="Digite sua senha"
+            autocomplete="current-password"
+            required
+        >
+
+
+        <button type="submit">
+            🔐 Entrar
+        </button>
+
+
+    </form>
+
+
+    <div id="mensagem"></div>
+
+
+    <a
+        class="voltar"
+        href="index.html"
+    >
+        ← Voltar para a loja
+    </a>
+
+
+</div>
+
+
+<script>
+
+const acessoForm =
+    document.getElementById("acessoForm");
+
+const mensagem =
+    document.getElementById("mensagem");
+
+
+acessoForm.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim()
+                .toLowerCase();
+
+
+        const senha =
+            document
+                .getElementById("senha")
+                .value;
+
+
+        // LOGIN DO ADMINISTRADOR
+
+        if (
+            email === "admin@shalom.com" &&
+            senha === "123456"
+        ) {
+
+            localStorage.setItem(
+                "tipoUsuario",
+                "admin"
+            );
+
+
+            localStorage.setItem(
+                "usuarioLogado",
+                email
+            );
+
+
+            localStorage.setItem(
+                "nomeUsuario",
+                "Administrador"
+            );
+
+
+            mensagem.style.color = "green";
+
+            mensagem.textContent =
+                "✅ Login correto! Abrindo painel...";
+
+
+            setTimeout(function() {
+
+                window.location.href =
+                    "admin.html";
+
+            }, 500);
+
+
+            return;
+        }
+
+
+        // LOGIN INCORRETO
+
+        mensagem.style.color = "red";
+
+        mensagem.textContent =
+            "❌ E-mail ou senha incorretos.";
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

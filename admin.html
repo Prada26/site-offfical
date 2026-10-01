@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Painel Administrativo - Shalom</title>
+
+    <link rel="stylesheet" href="admin.css">
+
+</head>
+
+<body>
+
+    <header>
+
+        <div class="logo">
+            📦 Loja Shalom
+            <span>Admin</span>
+        </div>
+
+        <button
+            class="sair"
+            onclick="sair()"
+        >
+            🚪 Sair
+        </button>
+
+    </header>
+
+
+    <main>
+
+        <div class="titulo">
+
+            <h1>
+                📊 Painel Administrativo
+            </h1>
+
+            <p>
+                Gerencie sua loja e seus depósitos.
+            </p>
+
+        </div>
+
+
+        <!-- CARDS -->
+
+        <section class="cards">
+
+            <div class="card">
+
+                <div class="icone">
+                    💰
+                </div>
+
+                <div>
+                    <span>
+                        Saldo
+                    </span>
+
+                    <strong id="saldo">
+                        R$ 0,00
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icone">
+                    📦
+                </div>
+
+                <div>
+                    <span>
+                        Produtos
+                    </span>
+
+                    <strong>
+                        4
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="icone">
+                    💳
+                </div>
+
+                <div>
+                    <span>
+                        Depósitos
+                    </span>
+
+                    <strong id="quantidadeDepositos">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- DEPÓSITO -->
+
+        <section class="painel">
+
+            <h2>
+                💰 Registrar depósito
+            </h2>
+
+            <form id="depositoForm">
+
+                <label for="valor">
+                    Valor do depósito
+                </label>
+
+                <input
+                    type="number"
+                    id="valor"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Ex: 500,00"
+                    required
+                >
+
+
+                <label for="descricao">
+                    Descrição
+                </label>
+
+                <input
+                    type="text"
+                    id="descricao"
+                    placeholder="Ex: Depósito inicial"
+                    required
+                >
+
+
+                <button type="submit">
+                    + Registrar depósito
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- HISTÓRICO -->
+
+        <section class="painel">
+
+            <h2>
+                🧾 Histórico de depósitos
+            </h2>
+
+            <div id="listaDepositos">
+
+                <p class="vazio">
+                    Nenhum depósito registrado.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUTOS -->
+
+        <section class="painel">
+
+            <h2>
+                📦 Produtos da loja
+            </h2>
+
+            <div class="produtos-admin">
+
+                <div>
+                    📦 Caixa de Papelão
+                    <strong>R$ 10,90</strong>
+                </div>
+
+                <div>
+                    🛍️ Sacola Kraft
+                    <strong>R$ 10,50</strong>
+                </div>
+
+                <div>
+                    🥡 Embalagem Delivery
+                    <strong>R$ 10,00</strong>
+                </div>
+
+                <div>
+                    🥤 Copo Descartável
+                    <strong>R$ 10,90</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="admin.js"></script>
+
+</body>
+
+</html>
