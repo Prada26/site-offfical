@@ -1,48 +1,38 @@
 // ==========================================
-// ADMIN.JS
-// LOJA SHALOM EMBALAGENS
+// ADMIN.JS - LOJA SHALOM EMBALAGENS
 // ==========================================
 
 (() => {
-
     "use strict";
-
 
     // ==========================================
     // PROTEÇÃO DO ADMIN
     // ==========================================
 
-    if (localStorage.getItem("tipoUsuario") !== "admin") {
-
-        window.location.href = "login.html";
-
+    if (
+        localStorage.getItem("tipoUsuario") !== "admin" ||
+        localStorage.getItem("usuarioLogado") !== "true"
+    ) {
+        window.location.replace("login.html");
         return;
     }
 
-
     // ==========================================
-    // CHAVES DO LOCALSTORAGE
+    // CHAVES
     // ==========================================
 
     const CHAVES = {
-
         depositos: "depositosShalom",
-
         produtos: "produtosShalom",
-
         usuarios: "usuariosShalom",
-
         pedidos: "pedidosShalom"
-
     };
-
 
     // ==========================================
     // PRODUTOS PADRÃO
     // ==========================================
 
     const produtosPadrao = [
-
         {
             id: "caixa",
             nome: "Caixa de Papelão",
@@ -51,7 +41,6 @@
             observacao: "",
             imagem: "caixa-de-papelao.webp"
         },
-
         {
             id: "sacola",
             nome: "Sacola Kraft",
@@ -60,7 +49,6 @@
             observacao: "",
             imagem: ""
         },
-
         {
             id: "delivery",
             nome: "Embalagem Delivery",
@@ -69,7 +57,6 @@
             observacao: "",
             imagem: "embalagens.jpg"
         },
-
         {
             id: "copo",
             nome: "Copo Descartável",
@@ -78,51 +65,32 @@
             observacao: "",
             imagem: "copos.png.webp"
         }
-
     ];
-
 
     // ==========================================
     // FUNÇÕES GERAIS
     // ==========================================
 
     function lerLista(chave) {
-
         try {
-
             const dados = JSON.parse(
                 localStorage.getItem(chave) || "[]"
             );
 
-            return Array.isArray(dados)
-                ? dados
-                : [];
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao ler localStorage:",
-                chave,
-                erro
-            );
-
+            return Array.isArray(dados) ? dados : [];
+        } catch {
             return [];
         }
     }
 
-
     function salvarLista(chave, lista) {
-
         localStorage.setItem(
             chave,
             JSON.stringify(lista)
         );
-
     }
 
-
     function dinheiro(valor) {
-
         return Number(valor || 0).toLocaleString(
             "pt-BR",
             {
@@ -130,186 +98,99 @@
                 currency: "BRL"
             }
         );
-
     }
 
-
     function escapeHTML(valor) {
-
         return String(valor ?? "")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
-
     }
-
-
-    // ==========================================
-    // MENSAGEM
-    // ==========================================
-
-    function mostrarMensagem(texto, cor = "") {
-
-        const elemento =
-            document.getElementById(
-                "mensagemDeposito"
-            );
-
-        if (!elemento) return;
-
-        elemento.textContent = texto;
-
-        elemento.style.color = cor;
-
-    }
-
 
     // ==========================================
     // DEPÓSITOS
     // ==========================================
 
     function registrarDeposito(event) {
-
         event.preventDefault();
 
-
         const campoValor =
-            document.getElementById(
-                "valorDeposito"
-            );
-
+            document.getElementById("valorDeposito");
 
         const campoDescricao =
-            document.getElementById(
-                "descricaoDeposito"
-            );
-
+            document.getElementById("descricaoDeposito");
 
         const valor = Number(
-            String(
-                campoValor?.value || ""
-            ).replace(",", ".")
+            String(campoValor?.value || "")
+                .replace(",", ".")
         );
 
-
-        if (
-            !Number.isFinite(valor) ||
-            valor <= 0
-        ) {
-
-            mostrarMensagem(
-                "❌ Digite um valor válido.",
-                "red"
-            );
-
+        if (!Number.isFinite(valor) || valor <= 0) {
+            alert("Digite um valor válido.");
             campoValor?.focus();
-
             return;
         }
 
-
-        const depositos =
-            lerLista(CHAVES.depositos);
-
+        const depositos = lerLista(CHAVES.depositos);
 
         depositos.push({
-
             id: Date.now(),
-
-            valor: valor,
-
+            valor,
             descricao:
                 campoDescricao?.value.trim() ||
                 "Depósito",
-
-            data:
-                new Date().toLocaleString(
-                    "pt-BR"
-                )
-
+            data: new Date().toLocaleString("pt-BR")
         });
-
 
         salvarLista(
             CHAVES.depositos,
             depositos
         );
 
-
-        if (campoValor) {
-            campoValor.value = "";
-        }
-
-
-        if (campoDescricao) {
-            campoDescricao.value = "";
-        }
-
-
-        mostrarMensagem(
-            "✅ Depósito registrado com sucesso!",
-            "green"
-        );
-
+        if (campoValor) campoValor.value = "";
+        if (campoDescricao) campoDescricao.value = "";
 
         carregarDepositos();
-
         atualizarResumo();
 
+        alert("✅ Depósito registrado!");
     }
 
-
     function carregarDepositos() {
-
         const lista =
-            document.getElementById(
-                "listaDepositos"
-            );
-
+            document.getElementById("listaDepositos");
 
         if (!lista) return;
 
-
-        const depositos =
-            lerLista(CHAVES.depositos)
-                .sort(
-                    (a, b) =>
-                        Number(b.id || 0) -
-                        Number(a.id || 0)
-                );
-
+        const depositos = lerLista(
+            CHAVES.depositos
+        ).sort(
+            (a, b) =>
+                Number(b.id || 0) -
+                Number(a.id || 0)
+        );
 
         if (!depositos.length) {
-
             lista.innerHTML = `
                 <p class="vazio">
                     📭 Nenhum depósito registrado.
                 </p>
             `;
-
             return;
         }
 
-
         lista.innerHTML = "";
 
-
         depositos.forEach(deposito => {
-
             const item =
                 document.createElement("div");
 
-
-            item.className =
-                "item item-linha";
-
+            item.className = "item item-linha";
 
             item.innerHTML = `
-
                 <div>
-
                     <strong class="valor">
                         ${dinheiro(deposito.valor)}
                     </strong>
@@ -326,9 +207,7 @@
                             deposito.data || ""
                         )}
                     </small>
-
                 </div>
-
 
                 <button
                     type="button"
@@ -336,544 +215,270 @@
                 >
                     🗑️ Excluir
                 </button>
-
             `;
-
 
             item
                 .querySelector(".btn-excluir")
                 ?.addEventListener(
                     "click",
-                    () =>
-                        excluirDeposito(
-                            deposito.id
-                        )
+                    () => excluirDeposito(deposito.id)
                 );
 
-
             lista.appendChild(item);
-
         });
-
     }
 
-
     function excluirDeposito(id) {
-
-        if (
-            !confirm(
-                "Tem certeza que deseja excluir este depósito?"
-            )
-        ) {
-
+        if (!confirm("Excluir este depósito?")) {
             return;
         }
 
-
-        const depositos =
-            lerLista(CHAVES.depositos)
-                .filter(
-                    deposito =>
-                        String(deposito.id) !==
-                        String(id)
-                );
-
+        const depositos = lerLista(
+            CHAVES.depositos
+        ).filter(
+            item =>
+                String(item.id) !== String(id)
+        );
 
         salvarLista(
             CHAVES.depositos,
             depositos
         );
 
-
         carregarDepositos();
-
         atualizarResumo();
-
     }
-
 
     // ==========================================
     // PRODUTOS
     // ==========================================
 
     function obterProdutos() {
-
-        const produtos =
-            lerLista(CHAVES.produtos);
-
-
-        if (produtos.length) {
-
-            return produtos.map(produto => ({
-
-                ...produto,
-
-                observacao:
-                    produto.observacao || "",
-
-                imagem:
-                    produto.imagem || ""
-
-            }));
-
-        }
-
-
-        salvarLista(
-            CHAVES.produtos,
-            produtosPadrao
+        let produtos = lerLista(
+            CHAVES.produtos
         );
 
+        if (!produtos.length) {
+            produtos = [...produtosPadrao];
 
-        return [...produtosPadrao];
+            salvarLista(
+                CHAVES.produtos,
+                produtos
+            );
+        }
 
+        return produtos.map(produto => ({
+            ...produto,
+            observacao: produto.observacao || "",
+            imagem: produto.imagem || ""
+        }));
     }
 
-
-    // ==========================================
-    // ABRIR FORMULÁRIO DE PRODUTO
-    // ==========================================
-
     function abrirFormularioProduto(produto = null) {
-
         const formulario =
             document.getElementById(
                 "formularioProduto"
             );
-
 
         if (!formulario) return;
 
+        formulario.classList.remove("oculto");
 
-        formulario.classList.remove(
-            "oculto"
-        );
+        document.getElementById("produtoId").value =
+            produto?.id ?? "";
 
+        document.getElementById("nomeProduto").value =
+            produto?.nome ?? "";
 
-        const produtoId =
-            document.getElementById(
-                "produtoId"
-            );
+        document.getElementById("precoProduto").value =
+            produto?.preco ?? "";
 
-        const nomeProduto =
-            document.getElementById(
-                "nomeProduto"
-            );
+        document.getElementById("estoqueProduto").value =
+            produto?.estoque ?? 0;
 
-        const precoProduto =
-            document.getElementById(
-                "precoProduto"
-            );
+        document.getElementById("observacaoProduto").value =
+            produto?.observacao ?? "";
 
-        const estoqueProduto =
-            document.getElementById(
-                "estoqueProduto"
-            );
+        document.getElementById("imagemProduto").value =
+            produto?.imagem ?? "";
 
-        const observacaoProduto =
-            document.getElementById(
-                "observacaoProduto"
-            );
-
-        const imagemProduto =
-            document.getElementById(
-                "imagemProduto"
-            );
-
-
-        if (produtoId) {
-
-            produtoId.value =
-                produto?.id ?? "";
-
-        }
-
-
-        if (nomeProduto) {
-
-            nomeProduto.value =
-                produto?.nome ?? "";
-
-        }
-
-
-        if (precoProduto) {
-
-            precoProduto.value =
-                produto?.preco ?? "";
-
-        }
-
-
-        if (estoqueProduto) {
-
-            estoqueProduto.value =
-                produto?.estoque ?? 0;
-
-        }
-
-
-        if (observacaoProduto) {
-
-            observacaoProduto.value =
-                produto?.observacao ?? "";
-
-        }
-
-
-        if (imagemProduto) {
-
-            imagemProduto.value =
-                produto?.imagem ?? "";
-
-        }
-
-
-        nomeProduto?.focus();
-
+        document
+            .getElementById("nomeProduto")
+            ?.focus();
     }
 
-
-    // ==========================================
-    // FECHAR FORMULÁRIO
-    // ==========================================
-
     function fecharFormularioProduto() {
+        document
+            .getElementById("formularioProduto")
+            ?.classList.add("oculto");
 
-        const formulario =
-            document.getElementById(
-                "formularioProduto"
-            );
-
-
-        formulario?.classList.add(
-            "oculto"
-        );
-
-
-        const campos = [
-
+        [
             "produtoId",
-
             "nomeProduto",
-
             "precoProduto",
-
             "estoqueProduto",
-
             "observacaoProduto",
-
             "imagemProduto"
-
-        ];
-
-
-        campos.forEach(id => {
-
+        ].forEach(id => {
             const campo =
                 document.getElementById(id);
 
-
-            if (campo) {
-
-                campo.value = "";
-
-            }
-
+            if (campo) campo.value = "";
         });
-
     }
 
-
-    // ==========================================
-    // SALVAR PRODUTO
-    // ==========================================
-
     function salvarProduto(event) {
-
         event.preventDefault();
 
-
         const id =
-            document.getElementById(
-                "produtoId"
-            )?.value.trim() || "";
-
+            document.getElementById("produtoId")
+                ?.value.trim() || "";
 
         const nome =
-            document.getElementById(
-                "nomeProduto"
-            )?.value.trim() || "";
+            document.getElementById("nomeProduto")
+                ?.value.trim() || "";
 
+        const preco = Number(
+            String(
+                document.getElementById("precoProduto")
+                    ?.value || ""
+            ).replace(",", ".")
+        );
 
-        const preco =
-            Number(
-                String(
-                    document.getElementById(
-                        "precoProduto"
-                    )?.value || ""
-                ).replace(",", ".")
-            );
-
-
-        const estoque =
-            Number(
-                document.getElementById(
-                    "estoqueProduto"
-                )?.value || 0
-            );
-
+        const estoque = Number(
+            document.getElementById("estoqueProduto")
+                ?.value || 0
+        );
 
         const observacao =
-            document.getElementById(
-                "observacaoProduto"
-            )?.value.trim() || "";
-
+            document.getElementById("observacaoProduto")
+                ?.value.trim() || "";
 
         const imagem =
-            document.getElementById(
-                "imagemProduto"
-            )?.value.trim() || "";
-
+            document.getElementById("imagemProduto")
+                ?.value.trim() || "";
 
         if (!nome) {
-
-            alert(
-                "Digite o nome do produto."
-            );
-
+            alert("Digite o nome do produto.");
             return;
         }
 
-
-        if (
-            !Number.isFinite(preco) ||
-            preco < 0
-        ) {
-
-            alert(
-                "Digite um preço válido."
-            );
-
+        if (!Number.isFinite(preco) || preco < 0) {
+            alert("Digite um preço válido.");
             return;
         }
 
-
-        if (
-            !Number.isInteger(estoque) ||
-            estoque < 0
-        ) {
-
-            alert(
-                "Digite um estoque válido."
-            );
-
+        if (!Number.isInteger(estoque) || estoque < 0) {
+            alert("Digite um estoque válido.");
             return;
         }
 
+        const produtos = obterProdutos();
 
-        const produtos =
-            obterProdutos();
-
-
-        // EDITAR
         if (id) {
-
-            const index =
-                produtos.findIndex(
-                    produto =>
-                        String(produto.id) ===
-                        String(id)
-                );
-
+            const index = produtos.findIndex(
+                produto =>
+                    String(produto.id) === String(id)
+            );
 
             if (index === -1) {
-
-                alert(
-                    "Produto não encontrado."
-                );
-
+                alert("Produto não encontrado.");
                 return;
             }
 
-
             produtos[index] = {
-
                 ...produtos[index],
-
                 nome,
-
                 preco,
-
                 estoque,
-
                 observacao,
-
                 imagem
-
             };
-
-        }
-
-        // NOVO
-        else {
-
+        } else {
             produtos.push({
-
-                id:
-                    Date.now(),
-
+                id: Date.now(),
                 nome,
-
                 preco,
-
                 estoque,
-
                 observacao,
-
                 imagem
-
             });
-
         }
-
 
         salvarLista(
             CHAVES.produtos,
             produtos
         );
 
-
         fecharFormularioProduto();
-
         carregarProdutos();
-
         atualizarResumo();
 
-
-        alert(
-            "✅ Produto salvo com sucesso!"
-        );
-
+        alert("✅ Produto salvo!");
     }
 
-
-    // ==========================================
-    // MOSTRAR PRODUTOS
-    // ==========================================
-
     function carregarProdutos() {
-
         const lista =
-            document.getElementById(
-                "listaProdutos"
-            );
-
+            document.getElementById("listaProdutos");
 
         if (!lista) return;
 
-
-        const produtos =
-            obterProdutos();
-
-
-        if (!produtos.length) {
-
-            lista.innerHTML = `
-                <p class="vazio">
-                    Nenhum produto cadastrado.
-                </p>
-            `;
-
-            return;
-        }
-
+        const produtos = obterProdutos();
 
         lista.innerHTML = "";
 
-
         produtos.forEach(produto => {
-
             const item =
                 document.createElement("div");
 
+            item.className = "item item-linha";
 
-            item.className =
-                "item item-linha";
-
-
-            const imagem =
-                produto.imagem
-                    ? `
-                        <img
-                            class="produto-imagem"
-                            src="${escapeHTML(
-                                produto.imagem
-                            )}"
-                            alt="${escapeHTML(
-                                produto.nome
-                            )}"
-                        >
-                    `
-                    : "";
-
+            const imagem = produto.imagem
+                ? `
+                    <img
+                        class="produto-imagem"
+                        src="${escapeHTML(produto.imagem)}"
+                        alt="${escapeHTML(produto.nome)}"
+                    >
+                `
+                : "";
 
             const observacao =
                 produto.observacao
                     ? `
                         <div class="observacao-produto">
-
-                            📝
-                            <strong>
-                                Obs.:
-                            </strong>
-
+                            📝 <strong>Obs.:</strong>
                             ${escapeHTML(
                                 produto.observacao
                             )}
-
                         </div>
                     `
                     : "";
 
-
             item.innerHTML = `
-
                 <div class="produto-conteudo">
-
                     ${imagem}
 
                     <div>
-
                         <strong>
-                            ${escapeHTML(
-                                produto.nome
-                            )}
+                            ${escapeHTML(produto.nome)}
                         </strong>
 
                         <div>
                             Preço:
-                            ${dinheiro(
-                                produto.preco
-                            )}
+                            ${dinheiro(produto.preco)}
                         </div>
 
                         <small>
                             Estoque:
-                            ${Number(
-                                produto.estoque
-                            ) || 0}
+                            ${Number(produto.estoque) || 0}
                         </small>
 
                         ${observacao}
-
                     </div>
-
                 </div>
 
-
                 <div class="acoes">
-
                     <button
                         type="button"
                         class="btn-editar"
@@ -881,297 +486,224 @@
                         ✏️ Editar
                     </button>
 
-
                     <button
                         type="button"
                         class="btn-excluir"
                     >
                         🗑️ Excluir
                     </button>
-
                 </div>
-
             `;
-
 
             item
                 .querySelector(".btn-editar")
                 ?.addEventListener(
                     "click",
-                    () =>
-                        abrirFormularioProduto(
-                            produto
-                        )
+                    () => abrirFormularioProduto(produto)
                 );
-
 
             item
                 .querySelector(".btn-excluir")
                 ?.addEventListener(
                     "click",
-                    () =>
-                        excluirProduto(
-                            produto.id
-                        )
+                    () => excluirProduto(produto.id)
                 );
 
-
             lista.appendChild(item);
-
         });
-
     }
 
-
-    // ==========================================
-    // EXCLUIR PRODUTO
-    // ==========================================
-
     function excluirProduto(id) {
-
-        if (
-            !confirm(
-                "Tem certeza que deseja excluir este produto?"
-            )
-        ) {
-
+        if (!confirm("Excluir este produto?")) {
             return;
         }
 
-
-        const produtos =
-            obterProdutos()
-                .filter(
-                    produto =>
-                        String(produto.id) !==
-                        String(id)
-                );
-
+        const produtos = obterProdutos().filter(
+            produto =>
+                String(produto.id) !== String(id)
+        );
 
         salvarLista(
             CHAVES.produtos,
             produtos
         );
 
-
         carregarProdutos();
-
         atualizarResumo();
-
     }
-
 
     // ==========================================
     // CLIENTES
     // ==========================================
 
     function carregarClientes() {
-
         const lista =
-            document.getElementById(
-                "listaClientes"
-            );
-
+            document.getElementById("listaClientes");
 
         if (!lista) return;
 
-
-        const clientes =
-            lerLista(
-                CHAVES.usuarios
-            )
-            .filter(
-                usuario =>
-                    usuario.tipo !== "admin"
-            );
-
+        const clientes = lerLista(
+            CHAVES.usuarios
+        ).filter(
+            usuario =>
+                usuario.tipo !== "admin"
+        );
 
         if (!clientes.length) {
-
             lista.innerHTML = `
                 <p class="vazio">
-                    Nenhum cliente cadastrado.
+                    👤 Nenhum cliente cadastrado.
                 </p>
             `;
-
             return;
         }
 
-
         lista.innerHTML = "";
 
-
         clientes.forEach(cliente => {
-
             const item =
                 document.createElement("div");
 
-
             item.className = "item";
 
-
             item.innerHTML = `
-
                 <strong>
                     👤 ${escapeHTML(
-                        cliente.nome ||
-                        "Cliente"
+                        cliente.nome || "Cliente"
                     )}
                 </strong>
 
                 <div>
                     📧 ${escapeHTML(
-                        cliente.email ||
-                        ""
+                        cliente.email || ""
                     )}
                 </div>
-
             `;
 
-
             lista.appendChild(item);
-
         });
-
     }
 
-
     // ==========================================
-    // PEDIDOS DOS CLIENTES
+    // PEDIDOS
     // ==========================================
 
     function carregarPedidos() {
-
         const lista =
-            document.getElementById(
-                "listaPedidos"
-            );
+            document.getElementById("listaPedidos");
 
+        if (!lista) return;
 
-        if (!lista) {
-
-            console.warn(
-                "⚠️ #listaPedidos não encontrado no admin.html."
-            );
-
-            return;
-        }
-
-
-        const pedidos =
-            lerLista(
-                CHAVES.pedidos
-            )
-            .sort(
-                (a, b) =>
-                    Number(b.id || 0) -
-                    Number(a.id || 0)
-            );
-
-
-        // --------------------------------------
-        // NENHUM PEDIDO
-        // --------------------------------------
+        const pedidos = lerLista(
+            CHAVES.pedidos
+        ).sort(
+            (a, b) =>
+                Number(b.id || 0) -
+                Number(a.id || 0)
+        );
 
         if (!pedidos.length) {
-
             lista.innerHTML = `
-
-                <div class="vazio">
-
+                <p class="vazio">
                     🛒 Nenhum pedido registrado.
-
-                </div>
-
+                </p>
             `;
-
             return;
         }
-
 
         lista.innerHTML = "";
 
-
-        // --------------------------------------
-        // PEDIDOS
-        // --------------------------------------
-
-        pedidos.forEach(pedido => {
+        pedidos.forEach((pedido, indice) => {
 
             const item =
                 document.createElement("div");
 
-
             item.className =
                 "item pedido-admin";
 
+            // --------------------------------------
+            // CLIENTE
+            // --------------------------------------
 
-            // ----------------------------------
-            // PRODUTOS
-            // ----------------------------------
+            const nomeCliente =
+                pedido.nome ||
+                pedido.nomeCliente ||
+                pedido.clienteNome ||
+                pedido.usuarioNome ||
+                "Cliente";
 
-            let itensHTML = "";
+            const email =
+                pedido.email ||
+                pedido.clienteEmail ||
+                "";
 
+            // --------------------------------------
+            // CONTATO
+            // --------------------------------------
 
-            if (
-                Array.isArray(
-                    pedido.produtos
-                )
-            ) {
+            const telefone =
+                pedido.telefone ||
+                pedido.celular ||
+                pedido.whatsapp ||
+                "";
 
-                itensHTML =
-                    pedido.produtos
-                        .map(produto => {
+            // --------------------------------------
+            // ENDEREÇO
+            // --------------------------------------
 
-                            const quantidade =
-                                Number(
-                                    produto.quantidade
-                                ) || 0;
+            const endereco =
+                pedido.endereco ||
+                pedido.enderecoEntrega ||
+                "";
 
+            const numero =
+                pedido.numero ||
+                pedido.numeroEndereco ||
+                "";
 
-                            const preco =
-                                Number(
-                                    produto.preco
-                                ) || 0;
+            const cidade =
+                pedido.cidade ||
+                pedido.localidade ||
+                pedido.cidadeEntrega ||
+                "";
 
+            const estado =
+                pedido.estado ||
+                pedido.uf ||
+                "";
 
-                            const subtotal =
-                                Number(
-                                    produto.subtotal
-                                ) ||
-                                preco * quantidade;
+            // --------------------------------------
+            // PAGAMENTO
+            // --------------------------------------
 
+            const pagamento =
+                pedido.pagamento ||
+                pedido.formaPagamento ||
+                "Não informado";
 
-                            return `
+            // --------------------------------------
+            // DATA
+            // --------------------------------------
 
-                                <li>
+            const data =
+                pedido.data ||
+                pedido.dataPedido ||
+                pedido.criadoEm ||
+                "";
 
-                                    ${escapeHTML(
-                                        produto.nome ||
-                                        "Produto"
-                                    )}
+            // --------------------------------------
+            // TOTAL
+            // --------------------------------------
 
-                                    x${quantidade}
+            const total = Number(
+                pedido.total ||
+                pedido.valor ||
+                0
+            );
 
-                                    -
-
-                                    ${dinheiro(
-                                        subtotal
-                                    )}
-
-                                </li>
-
-                            `;
-
-                        })
-                        .join("");
-
-            }
-
-
-            // ----------------------------------
+            // --------------------------------------
             // OBSERVAÇÃO
-            // ----------------------------------
+            // --------------------------------------
 
             const observacao =
                 pedido.observacao ||
@@ -1179,274 +711,165 @@
                 pedido.observacaoPedido ||
                 "";
 
+            // --------------------------------------
+            // NÚMERO DO PEDIDO
+            // --------------------------------------
 
-            // ----------------------------------
-            // TELEFONE
-            // ----------------------------------
+            const numeroPedido =
+                pedido.numeroPedido ||
+                pedido.id ||
+                pedidos.length - indice;
 
-            const telefone =
-                pedido.telefone ||
-                pedido.celular ||
-                "";
+            // --------------------------------------
+            // PRODUTOS
+            // --------------------------------------
 
+            const produtos =
+                Array.isArray(pedido.produtos)
+                    ? pedido.produtos
+                    : Array.isArray(pedido.itens)
+                        ? pedido.itens
+                        : [];
 
-            // ----------------------------------
-            // ENDEREÇO
-            // ----------------------------------
+            let itensHTML = "";
 
-            const endereco =
-                pedido.endereco ||
-                "";
+            produtos.forEach(produto => {
+                const quantidade =
+                    Number(
+                        produto.quantidade ||
+                        produto.qtd ||
+                        1
+                    );
 
+                const preco =
+                    Number(produto.preco || 0);
 
-            const numero =
-                pedido.numero ||
-                "";
+                const subtotal =
+                    Number(
+                        produto.subtotal ||
+                        preco * quantidade
+                    );
 
+                itensHTML += `
+                    <li>
+                        ${escapeHTML(
+                            produto.nome ||
+                            "Produto"
+                        )}
+                        x${quantidade}
+                        -
+                        ${dinheiro(subtotal)}
+                    </li>
+                `;
+            });
 
-            const cidade =
-                pedido.cidade ||
-                "";
+            if (!itensHTML) {
+                itensHTML =
+                    "<li>Nenhum produto informado.</li>";
+            }
 
+            // --------------------------------------
+            // ENDEREÇO COMPLETO
+            // --------------------------------------
 
-            // ----------------------------------
-            // CLIENTE
-            // ----------------------------------
+            let enderecoCompleto =
+                endereco || "Não informado";
 
-            const nomeCliente =
-                pedido.nome ||
-                pedido.nomeCliente ||
-                "Cliente";
+            if (numero) {
+                enderecoCompleto +=
+                    `, ${numero}`;
+            }
 
+            // --------------------------------------
+            // CIDADE COMPLETA
+            // --------------------------------------
 
-            // ----------------------------------
-            // PAGAMENTO
-            // ----------------------------------
+            let cidadeCompleta =
+                cidade || "Não informada";
 
-            const pagamento =
-                pedido.pagamento ||
-                pedido.formaPagamento ||
-                "Não informado";
+            if (estado) {
+                cidadeCompleta +=
+                    ` - ${estado}`;
+            }
 
-
-            // ----------------------------------
-            // DATA
-            // ----------------------------------
-
-            const data =
-                pedido.data ||
-                pedido.dataPedido ||
-                "";
-
-
-            // ----------------------------------
-            // HTML DO PEDIDO
-            // ----------------------------------
+            // --------------------------------------
+            // HTML
+            // --------------------------------------
 
             item.innerHTML = `
-
                 <div class="item-linha">
 
                     <strong>
-
-                        🛒 Pedido
-                        #${escapeHTML(
-                            pedido.id
+                        📦 Pedido ${escapeHTML(
+                            numeroPedido
                         )}
-
                     </strong>
 
-
                     <strong class="valor">
-
-                        ${dinheiro(
-                            pedido.total
-                        )}
-
+                        ${dinheiro(total)}
                     </strong>
 
                 </div>
-
 
                 <hr>
 
-
                 <div>
-
-                    👤
-
-                    <strong>
-                        Cliente:
-                    </strong>
-
-                    ${escapeHTML(
-                        nomeCliente
-                    )}
-
+                    👤 <strong>Cliente:</strong>
+                    ${escapeHTML(nomeCliente)}
                 </div>
 
-
-                ${
-                    telefone
-                        ? `
-                            <div>
-
-                                📞
-
-                                <strong>
-                                    Telefone:
-                                </strong>
-
-                                ${escapeHTML(
-                                    telefone
-                                )}
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    pedido.email
-                        ? `
-                            <div>
-
-                                📧
-
-                                <strong>
-                                    E-mail:
-                                </strong>
-
-                                ${escapeHTML(
-                                    pedido.email
-                                )}
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    endereco
-                        ? `
-                            <div>
-
-                                🏠
-
-                                <strong>
-                                    Endereço:
-                                </strong>
-
-                                ${escapeHTML(
-                                    endereco
-                                )}
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    numero
-                        ? `
-                            <div>
-
-                                🔢
-
-                                <strong>
-                                    Número:
-                                </strong>
-
-                                ${escapeHTML(
-                                    numero
-                                )}
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    cidade
-                        ? `
-                            <div>
-
-                                📍
-
-                                <strong>
-                                    Cidade:
-                                </strong>
-
-                                ${escapeHTML(
-                                    cidade
-                                )}
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
                 <div>
-
-                    💳
-
-                    <strong>
-                        Pagamento:
-                    </strong>
-
+                    📞 <strong>Telefone:</strong>
                     ${escapeHTML(
-                        pagamento
+                        telefone || "Não informado"
                     )}
-
                 </div>
 
+                <div>
+                    📧 <strong>E-mail:</strong>
+                    ${escapeHTML(
+                        email || "Não informado"
+                    )}
+                </div>
 
-                ${
-                    data
-                        ? `
-                            <div>
+                <div>
+                    🏠 <strong>Endereço:</strong>
+                    ${escapeHTML(
+                        enderecoCompleto
+                    )}
+                </div>
 
-                                📅
+                <div>
+                    📍 <strong>Cidade:</strong>
+                    ${escapeHTML(
+                        cidadeCompleta
+                    )}
+                </div>
 
-                                <strong>
-                                    Data:
-                                </strong>
+                <div>
+                    💳 <strong>Pagamento:</strong>
+                    ${escapeHTML(pagamento)}
+                </div>
 
-                                ${escapeHTML(
-                                    data
-                                )}
-
-                            </div>
-                        `
-                        : ""
-                }
-
+                <div>
+                    📅 <strong>Data:</strong>
+                    ${escapeHTML(
+                        data || "Não informada"
+                    )}
+                </div>
 
                 ${
                     observacao
                         ? `
                             <div class="observacao-pedido">
-
-                                📝
-
-                                <strong>
-                                    Observação:
-                                </strong>
-
+                                📝 <strong>Observação:</strong>
                                 ${escapeHTML(
                                     observacao
                                 )}
-
                             </div>
                         `
                         : ""
                 }
-
 
                 <div class="pedido-produtos">
 
@@ -1454,271 +877,159 @@
                         📦 Produtos:
                     </strong>
 
-
                     <ul class="pedido-itens">
-
-                        ${
-                            itensHTML ||
-                            "<li>Nenhum produto informado.</li>"
-                        }
-
+                        ${itensHTML}
                     </ul>
 
                 </div>
-
             `;
 
-
             lista.appendChild(item);
-
         });
-
     }
-
 
     // ==========================================
     // RESUMO
     // ==========================================
 
     function atualizarResumo() {
-
         const depositos =
-            lerLista(
-                CHAVES.depositos
-            );
-
+            lerLista(CHAVES.depositos);
 
         const produtos =
             obterProdutos();
 
-
         const clientes =
-            lerLista(
-                CHAVES.usuarios
-            )
-            .filter(
-                usuario =>
-                    usuario.tipo !== "admin"
-            );
-
+            lerLista(CHAVES.usuarios)
+                .filter(
+                    usuario =>
+                        usuario.tipo !== "admin"
+                );
 
         const saldo =
             depositos.reduce(
-                (
-                    soma,
-                    deposito
-                ) => {
-
-                    return soma +
-                        (
-                            Number(
-                                deposito.valor
-                            ) || 0
-                        );
-
-                },
+                (total, deposito) =>
+                    total +
+                    Number(deposito.valor || 0),
                 0
             );
 
-
         const saldoElemento =
-            document.getElementById(
-                "saldo"
-            );
-
+            document.getElementById("saldo");
 
         const produtosElemento =
             document.getElementById(
                 "totalProdutos"
             );
 
-
         const clientesElemento =
             document.getElementById(
                 "totalClientes"
             );
-
 
         const depositosElemento =
             document.getElementById(
                 "totalDepositos"
             );
 
-
         if (saldoElemento) {
-
             saldoElemento.textContent =
                 dinheiro(saldo);
-
         }
-
 
         if (produtosElemento) {
-
             produtosElemento.textContent =
                 produtos.length;
-
         }
-
 
         if (clientesElemento) {
-
             clientesElemento.textContent =
                 clientes.length;
-
         }
-
 
         if (depositosElemento) {
-
             depositosElemento.textContent =
                 depositos.length;
-
         }
-
     }
-
 
     // ==========================================
     // SAIR
     // ==========================================
 
     function sair() {
-
-        const chaves = [
-
+        [
             "tipoUsuario",
-
             "usuarioLogado",
-
             "usuarioNome",
-
             "nomeUsuario",
-
             "clienteNome",
-
-            "clienteEmail"
-
-        ];
-
-
-        chaves.forEach(chave => {
-
+            "clienteEmail",
+            "usuarioAtual"
+        ].forEach(chave => {
             localStorage.removeItem(chave);
-
         });
-
 
         sessionStorage.clear();
 
-
-        window.location.href =
-            "login.html";
-
+        window.location.replace("login.html");
     }
 
-
     // ==========================================
-    // INICIALIZAÇÃO
+    // INICIAR
     // ==========================================
 
     function iniciarAdmin() {
 
-        // DEPÓSITOS
-
         document
-            .getElementById(
-                "depositoForm"
-            )
+            .getElementById("depositoForm")
             ?.addEventListener(
                 "submit",
                 registrarDeposito
             );
 
-
-        // NOVO PRODUTO
-
         document
-            .getElementById(
-                "btnNovoProduto"
-            )
+            .getElementById("btnNovoProduto")
             ?.addEventListener(
                 "click",
-                () =>
-                    abrirFormularioProduto()
+                () => abrirFormularioProduto()
             );
 
-
-        // CANCELAR
-
         document
-            .getElementById(
-                "btnCancelarProduto"
-            )
+            .getElementById("btnCancelarProduto")
             ?.addEventListener(
                 "click",
                 fecharFormularioProduto
             );
 
-
-        // FORMULÁRIO
-
         document
-            .getElementById(
-                "formularioProduto"
-            )
+            .getElementById("formularioProduto")
             ?.addEventListener(
                 "submit",
                 salvarProduto
             );
 
-
-        // SAIR
-
         document
-            .getElementById(
-                "btnSair"
-            )
+            .getElementById("btnSair")
             ?.addEventListener(
                 "click",
                 sair
             );
 
-
-        // CARREGAR DADOS
-
         carregarDepositos();
-
         carregarProdutos();
-
         carregarClientes();
-
         carregarPedidos();
-
         atualizarResumo();
-
     }
 
-
-    // ==========================================
-    // DOM PRONTO
-    // ==========================================
-
-    if (
-        document.readyState ===
-        "loading"
-    ) {
-
+    if (document.readyState === "loading") {
         document.addEventListener(
             "DOMContentLoaded",
             iniciarAdmin
         );
-
     } else {
-
         iniciarAdmin();
-
     }
-
 
 })();
