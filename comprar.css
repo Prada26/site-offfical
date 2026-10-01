@@ -1,0 +1,16 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#eef3f9;color:#172033;min-height:100vh}
+header{background:#0d47a1;color:#fff;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:23px;font-weight:700}.logo span{font-size:14px;opacity:.85;margin-left:7px}.header-acoes{display:flex;align-items:center;gap:10px}
+.header-acoes button{border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
+main{width:92%;max-width:1200px;margin:30px auto}.titulo{margin-bottom:25px}.titulo h1{color:#0d47a1;margin-bottom:6px}.titulo p{color:#64748b}
+.produtos{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.produto{background:#fff;padding:20px;border-radius:14px;box-shadow:0 4px 15px rgba(0,0,0,.08);border:1px solid #e1e8f0}
+.produto img{width:100%;height:180px;object-fit:contain;margin-bottom:10px}.produto h2{color:#0d47a1;font-size:20px;margin-bottom:8px}.produto p{color:#667085;margin-bottom:10px}.produto .observacao{background:#f6f9fd;border-left:3px solid #1976d2;padding:9px 10px;border-radius:5px;color:#4b5563;font-size:14px;line-height:1.45}
+.preco{display:block;font-size:20px;font-weight:700;margin-bottom:13px}.selecionar-item{display:block;margin-bottom:10px}.quantidade-input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
+.estoque{font-size:13px;color:#64748b;margin-bottom:10px}.sem-estoque{color:#c62828;font-weight:700}
+.resumo{margin-top:25px;background:#fff;padding:25px;border-radius:14px;box-shadow:0 4px 15px rgba(0,0,0,.08)}.resumo h2{margin-bottom:18px}
+.item-resumo{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #eee}.nenhum{color:#777}
+.total{display:flex;justify-content:space-between;margin-top:20px;font-size:21px}.botao{width:100%;margin-top:20px;padding:14px;border:0;border-radius:8px;background:#1976d2;color:#fff;font-size:17px;font-weight:700;cursor:pointer}
+.botao:disabled{opacity:.5;cursor:not-allowed}footer{text-align:center;padding:25px;color:#777}
+@media(max-width:700px){.produtos{grid-template-columns:1fr}}

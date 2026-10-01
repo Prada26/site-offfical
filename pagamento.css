@@ -1,0 +1,9 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;padding:25px;font-family:Arial,sans-serif;background:#eef3f9;color:#172033}
+.pagina{max-width:680px;margin:20px auto}.card{background:#fff;padding:30px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.08)}
+h1{color:#0d47a1;margin-bottom:8px}.card>p{color:#667085;margin-bottom:20px}
+label{display:block;font-weight:700;margin:14px 0 6px}input:not([type="radio"]){width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}
+fieldset{margin-top:20px;padding:15px;border:1px solid #ddd;border-radius:9px}fieldset label{font-weight:400;margin:10px 0}
+.resumo-pedido{background:#f6f9fd;border:1px solid #dce7f4;padding:15px;border-radius:10px;margin-bottom:20px}.resumo-linha{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e7eb}.resumo-total{font-size:20px;font-weight:700;margin-top:12px}
+button{width:100%;margin-top:20px;padding:14px;border:0;border-radius:8px;background:#1976d2;color:#fff;font-size:17px;font-weight:700;cursor:pointer}
+a{display:block;text-align:center;margin-top:18px;color:#1976d2;font-weight:700;text-decoration:none}

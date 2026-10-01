@@ -1,142 +1,336 @@
-const cadastroForm = document.getElementById("cadastroForm");
-const mensagem = document.getElementById("mensagem");
+// ==========================================
+// CADASTRO.JS
+// LOJA SHALOM EMBALAGENS
+// ==========================================
 
-cadastroForm.addEventListener("submit", function(event) {
+document.addEventListener("DOMContentLoaded", () => {
 
-    event.preventDefault();
-
-    const nome = document.getElementById("nome").value.trim();
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const senha = document.getElementById("senha").value;
-    const confirmarSenha = document.getElementById("confirmarSenha").value;
+    "use strict";
 
 
-    // =====================================
-    // VERIFICAR SENHAS
-    // =====================================
+    // ==========================================
+    // ELEMENTOS
+    // ==========================================
 
-    if (senha !== confirmarSenha) {
+    const form =
+        document.getElementById("cadastroForm");
 
-        mensagem.textContent =
-            "❌ As senhas não são iguais.";
+    const mensagem =
+        document.getElementById("mensagem");
 
-        mensagem.style.color = "red";
 
+    if (!form) {
         return;
     }
 
 
-    // =====================================
-    // TAMANHO DA SENHA
-    // =====================================
+    // ==========================================
+    // FUNÇÃO DE MENSAGEM
+    // ==========================================
 
-    if (senha.length < 6) {
+    function mostrarMensagem(texto, cor) {
 
-        mensagem.textContent =
-            "❌ A senha precisa ter pelo menos 6 caracteres.";
+        if (!mensagem) {
+            return;
+        }
 
-        mensagem.style.color = "red";
+        mensagem.textContent = texto;
 
-        return;
-    }
-
-
-    // =====================================
-    // CARREGAR CLIENTES
-    // =====================================
-
-    let usuarios = [];
-
-    try {
-
-        usuarios = JSON.parse(
-            localStorage.getItem("usuariosShalom") || "[]"
-        );
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao carregar usuários:",
-            erro
-        );
-
-        usuarios = [];
+        mensagem.style.color = cor || "";
 
     }
 
 
-    // =====================================
-    // VERIFICAR E-MAIL
-    // =====================================
+    // ==========================================
+    // LER USUÁRIOS
+    // ==========================================
 
-    const emailExiste = usuarios.some(function(usuario) {
+    function lerUsuarios() {
 
-        return (
-            String(usuario.email).toLowerCase() === email
-        );
+        try {
 
-    });
+            const dados =
+                JSON.parse(
+                    localStorage.getItem(
+                        "usuariosShalom"
+                    ) || "[]"
+                );
 
 
-    if (emailExiste) {
+            return Array.isArray(dados)
+                ? dados
+                : [];
 
-        mensagem.textContent =
-            "❌ Este e-mail já está cadastrado.";
+        } catch (erro) {
 
-        mensagem.style.color = "red";
+            console.error(
+                "Erro ao ler usuários:",
+                erro
+            );
 
-        return;
+            return [];
+        }
+
     }
 
 
-    // =====================================
-    // CRIAR CLIENTE
-    // =====================================
+    // ==========================================
+    // SALVAR USUÁRIOS
+    // ==========================================
 
-    const usuario = {
+    function salvarUsuarios(lista) {
 
-        id: Date.now(),
+        localStorage.setItem(
+            "usuariosShalom",
+            JSON.stringify(lista)
+        );
 
-        nome: nome,
-
-        email: email,
-
-        senha: senha
-
-    };
+    }
 
 
-    usuarios.push(usuario);
+    // ==========================================
+    // CADASTRO
+    // ==========================================
+
+    form.addEventListener(
+        "submit",
+        (event) => {
+
+            event.preventDefault();
 
 
-    // =====================================
-    // SALVAR CLIENTE
-    // =====================================
+            // --------------------------------------
+            // CAMPOS
+            // --------------------------------------
 
-    localStorage.setItem(
-        "usuariosShalom",
-        JSON.stringify(usuarios)
+            const campoNome =
+                document.getElementById("nome");
+
+            const campoEmail =
+                document.getElementById("email");
+
+            const campoSenha =
+                document.getElementById("senha");
+
+            const campoConfirmar =
+                document.getElementById(
+                    "confirmarSenha"
+                );
+
+
+            const nome =
+                campoNome?.value.trim() || "";
+
+
+            const email =
+                campoEmail?.value
+                    .trim()
+                    .toLowerCase() || "";
+
+
+            const senha =
+                campoSenha?.value || "";
+
+
+            const confirmar =
+                campoConfirmar?.value || "";
+
+
+            // --------------------------------------
+            // VALIDAR NOME
+            // --------------------------------------
+
+            if (!nome) {
+
+                mostrarMensagem(
+                    "❌ Digite seu nome.",
+                    "red"
+                );
+
+                campoNome?.focus();
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // VALIDAR E-MAIL
+            // --------------------------------------
+
+            if (!email) {
+
+                mostrarMensagem(
+                    "❌ Digite seu e-mail.",
+                    "red"
+                );
+
+                campoEmail?.focus();
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // VALIDAR SENHA
+            // --------------------------------------
+
+            if (senha.length < 6) {
+
+                mostrarMensagem(
+                    "❌ A senha precisa ter pelo menos 6 caracteres.",
+                    "red"
+                );
+
+                campoSenha?.focus();
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // CONFIRMAR SENHA
+            // --------------------------------------
+
+            if (senha !== confirmar) {
+
+                mostrarMensagem(
+                    "❌ As senhas não são iguais.",
+                    "red"
+                );
+
+                campoConfirmar?.focus();
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // E-MAIL DO ADMIN
+            // --------------------------------------
+
+            if (
+                email === "admin@shalom.com"
+            ) {
+
+                mostrarMensagem(
+                    "❌ Este e-mail é reservado para o administrador.",
+                    "red"
+                );
+
+                campoEmail?.focus();
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // LER USUÁRIOS
+            // --------------------------------------
+
+            const lista =
+                lerUsuarios();
+
+
+            // --------------------------------------
+            // VERIFICAR E-MAIL EXISTENTE
+            // --------------------------------------
+
+            const existe =
+                lista.some(
+                    usuario =>
+                        String(
+                            usuario?.email || ""
+                        )
+                            .trim()
+                            .toLowerCase() ===
+                        email
+                );
+
+
+            if (existe) {
+
+                mostrarMensagem(
+                    "❌ Este e-mail já está cadastrado.",
+                    "red"
+                );
+
+                campoEmail?.focus();
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // CRIAR USUÁRIO
+            // --------------------------------------
+
+            const usuario = {
+
+                id: Date.now(),
+
+                nome: nome,
+
+                email: email,
+
+                senha: senha,
+
+                tipo: "cliente"
+
+            };
+
+
+            // --------------------------------------
+            // ADICIONAR USUÁRIO
+            // --------------------------------------
+
+            lista.push(usuario);
+
+
+            salvarUsuarios(lista);
+
+
+            // --------------------------------------
+            // COMPATIBILIDADE
+            // --------------------------------------
+
+            localStorage.setItem(
+                "usuarioShalom",
+                JSON.stringify(usuario)
+            );
+
+
+            // --------------------------------------
+            // SUCESSO
+            // --------------------------------------
+
+            mostrarMensagem(
+                "✅ Cadastro realizado com sucesso!",
+                "green"
+            );
+
+
+            // --------------------------------------
+            // LIMPAR FORMULÁRIO
+            // --------------------------------------
+
+            form.reset();
+
+
+            // --------------------------------------
+            // IR PARA LOGIN
+            // --------------------------------------
+
+            setTimeout(
+                () => {
+
+                    window.location.href =
+                        "login.html";
+
+                },
+                1000
+            );
+
+        }
     );
-
-
-    // =====================================
-    // MENSAGEM
-    // =====================================
-
-    mensagem.textContent =
-        "✅ Cadastro realizado com sucesso!";
-
-    mensagem.style.color = "green";
-
-
-    // =====================================
-    // IR PARA LOGIN
-    // =====================================
-
-    setTimeout(function() {
-
-        window.location.href = "login.html";
-
-    }, 1000);
 
 });

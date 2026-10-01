@@ -1,387 +1,198 @@
-// =====================================================
-// ADMIN.JS - LOJA SHALOM EMBALAGENS
-// =====================================================
+// ==========================================
+// ADMIN.JS
+// LOJA SHALOM EMBALAGENS
+// ==========================================
 
-(function () {
+(() => {
 
     "use strict";
 
-    // =====================================================
+
+    // ==========================================
     // PROTEÇÃO DO ADMIN
-    // =====================================================
+    // ==========================================
 
     if (localStorage.getItem("tipoUsuario") !== "admin") {
+
         window.location.href = "login.html";
+
         return;
     }
 
 
-    // =====================================================
-    // INICIALIZAÇÃO
-    // =====================================================
+    // ==========================================
+    // CHAVES DO LOCALSTORAGE
+    // ==========================================
 
-    function iniciarAdmin() {
+    const CHAVES = {
 
-        console.log("✅ ADMIN.JS carregado");
+        depositos: "depositosShalom",
 
-        carregarDepositos();
-        carregarProdutos();
-        carregarClientes();
-        atualizarResumo();
-        configurarDeposito();
+        produtos: "produtosShalom",
 
-    }
+        usuarios: "usuariosShalom",
 
+        pedidos: "pedidosShalom"
 
-    if (document.readyState === "loading") {
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            iniciarAdmin
-        );
-
-    } else {
-
-        iniciarAdmin();
-
-    }
+    };
 
 
-    // =====================================================
-    // DINHEIRO
-    // =====================================================
+    // ==========================================
+    // PRODUTOS PADRÃO
+    // ==========================================
 
-    function formatarDinheiro(valor) {
+    const produtosPadrao = [
 
-        valor = Number(valor);
+        {
+            id: "caixa",
+            nome: "Caixa de Papelão",
+            preco: 10.90,
+            estoque: 0,
+            observacao: "",
+            imagem: "caixa-de-papelao.webp"
+        },
 
-        if (!Number.isFinite(valor)) {
-            valor = 0;
+        {
+            id: "sacola",
+            nome: "Sacola Kraft",
+            preco: 10.50,
+            estoque: 0,
+            observacao: "",
+            imagem: ""
+        },
+
+        {
+            id: "delivery",
+            nome: "Embalagem Delivery",
+            preco: 10.00,
+            estoque: 0,
+            observacao: "",
+            imagem: "embalagens.jpg"
+        },
+
+        {
+            id: "copo",
+            nome: "Copo Descartável",
+            preco: 10.90,
+            estoque: 0,
+            observacao: "",
+            imagem: "copos.png.webp"
         }
 
-        return valor.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
-
-    }
+    ];
 
 
-    // =====================================================
-    // DEPÓSITOS
-    // =====================================================
+    // ==========================================
+    // FUNÇÕES GERAIS
+    // ==========================================
 
-    function obterDepositos() {
+    function lerLista(chave) {
 
         try {
 
-            const dados =
-                localStorage.getItem(
-                    "depositosShalom"
-                );
+            const dados = JSON.parse(
+                localStorage.getItem(chave) || "[]"
+            );
 
-            if (!dados) {
-                return [];
-            }
-
-            const depositos =
-                JSON.parse(dados);
-
-            if (!Array.isArray(depositos)) {
-                return [];
-            }
-
-            return depositos;
+            return Array.isArray(dados)
+                ? dados
+                : [];
 
         } catch (erro) {
 
             console.error(
-                "❌ Erro ao carregar depósitos:",
+                "Erro ao ler localStorage:",
+                chave,
                 erro
             );
 
             return [];
-
         }
-
     }
 
 
-    // =====================================================
-    // SALVAR DEPÓSITOS
-    // =====================================================
+    function salvarLista(chave, lista) {
 
-    function salvarDepositos(depositos) {
-
-        try {
-
-            localStorage.setItem(
-                "depositosShalom",
-                JSON.stringify(depositos)
-            );
-
-            return true;
-
-        } catch (erro) {
-
-            console.error(
-                "❌ Erro ao salvar depósitos:",
-                erro
-            );
-
-            return false;
-
-        }
-
-    }
-
-
-    // =====================================================
-    // PEGAR CAMPO VALOR
-    // =====================================================
-
-    function pegarCampoValor() {
-
-        const campo =
-            document.getElementById(
-                "valorDeposito"
-            );
-
-        if (campo) {
-            return campo;
-        }
-
-        const formulario =
-            document.getElementById(
-                "depositoForm"
-            );
-
-        if (!formulario) {
-            return null;
-        }
-
-        return formulario.querySelector(
-            'input[type="number"], input[type="text"]'
+        localStorage.setItem(
+            chave,
+            JSON.stringify(lista)
         );
 
     }
 
 
-    // =====================================================
-    // PEGAR DESCRIÇÃO
-    // =====================================================
+    function dinheiro(valor) {
 
-    function pegarCampoDescricao() {
-
-        const campo =
-            document.getElementById(
-                "descricaoDeposito"
-            );
-
-        if (campo) {
-            return campo;
-        }
-
-        const formulario =
-            document.getElementById(
-                "depositoForm"
-            );
-
-        if (!formulario) {
-            return null;
-        }
-
-        const campos =
-            formulario.querySelectorAll(
-                'input[type="text"], textarea'
-            );
-
-        if (campos.length > 1) {
-            return campos[1];
-        }
-
-        return null;
+        return Number(valor || 0).toLocaleString(
+            "pt-BR",
+            {
+                style: "currency",
+                currency: "BRL"
+            }
+        );
 
     }
 
 
-    // =====================================================
+    function escapeHTML(valor) {
+
+        return String(valor ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ==========================================
     // MENSAGEM
-    // =====================================================
+    // ==========================================
 
-    function mostrarMensagem(texto, cor) {
+    function mostrarMensagem(texto, cor = "") {
 
-        const mensagem =
+        const elemento =
             document.getElementById(
                 "mensagemDeposito"
             );
 
-        if (!mensagem) {
-            console.log(texto);
-            return;
-        }
+        if (!elemento) return;
 
-        mensagem.textContent = texto;
-        mensagem.style.color =
-            cor || "black";
+        elemento.textContent = texto;
+
+        elemento.style.color = cor;
 
     }
 
 
-    // =====================================================
-    // CONFIGURAR DEPÓSITO
-    // =====================================================
+    // ==========================================
+    // DEPÓSITOS
+    // ==========================================
 
-    function configurarDeposito() {
+    function registrarDeposito(event) {
 
-        const formulario =
-            document.getElementById(
-                "depositoForm"
-            );
-
-        if (!formulario) {
-
-            console.warn(
-                "⚠️ #depositoForm não encontrado."
-            );
-
-            return;
-
-        }
-
-
-        // Evita configurar duas vezes
-        if (
-            formulario.dataset.configurado === "true"
-        ) {
-            return;
-        }
-
-        formulario.dataset.configurado = "true";
-
-
-        // =================================================
-        // GARANTIR QUE O BOTÃO SEJA SUBMIT
-        // =================================================
-
-        const botao =
-            formulario.querySelector(
-                'button[type="submit"], button:not([type])'
-            );
-
-        if (botao) {
-
-            botao.type = "submit";
-
-        }
-
-
-        // =================================================
-        // EVENTO DO FORMULÁRIO
-        // =================================================
-
-        formulario.addEventListener(
-            "submit",
-            function (evento) {
-
-                evento.preventDefault();
-                evento.stopPropagation();
-
-                registrarDeposito();
-
-            }
-        );
-
-
-        console.log(
-            "✅ Formulário de depósito configurado"
-        );
-
-    }
-
-
-    // =====================================================
-    // REGISTRAR DEPÓSITO
-    // =====================================================
-
-    function registrarDeposito() {
-
-        console.log(
-            "🟢 Iniciando registro de depósito..."
-        );
+        event.preventDefault();
 
 
         const campoValor =
-            pegarCampoValor();
+            document.getElementById(
+                "valorDeposito"
+            );
+
 
         const campoDescricao =
-            pegarCampoDescricao();
-
-
-        // =================================================
-        // VERIFICAR CAMPO
-        // =================================================
-
-        if (!campoValor) {
-
-            console.error(
-                "❌ Campo de valor não encontrado."
+            document.getElementById(
+                "descricaoDeposito"
             );
 
-            alert(
-                "Erro: campo de valor do depósito não encontrado.\n\n" +
-                "Verifique se existe:\n" +
-                'id="valorDeposito"'
-            );
 
-            return;
-
-        }
-
-
-        // =================================================
-        // PEGAR VALOR
-        // =================================================
-
-        let textoValor =
+        const valor = Number(
             String(
-                campoValor.value || ""
-            ).trim();
+                campoValor?.value || ""
+            ).replace(",", ".")
+        );
 
-
-        textoValor =
-            textoValor.replace(
-                /\s/g,
-                ""
-            );
-
-
-        // Aceita 500,50 e 500.50
-        if (
-            textoValor.includes(",") &&
-            textoValor.includes(".")
-        ) {
-
-            textoValor =
-                textoValor
-                    .replace(/\./g, "")
-                    .replace(",", ".");
-
-        } else {
-
-            textoValor =
-                textoValor.replace(",", ".");
-
-        }
-
-
-        const valor =
-            Number(textoValor);
-
-
-        // =================================================
-        // VALIDAR VALOR
-        // =================================================
 
         if (
             !Number.isFinite(valor) ||
@@ -393,123 +204,49 @@
                 "red"
             );
 
-            alert(
-                "Digite um valor válido."
-            );
-
-            campoValor.focus();
+            campoValor?.focus();
 
             return;
-
         }
 
-
-        // =================================================
-        // DESCRIÇÃO
-        // =================================================
-
-        let descricao =
-            "Depósito";
-
-
-        if (campoDescricao) {
-
-            descricao =
-                String(
-                    campoDescricao.value || ""
-                ).trim();
-
-
-            if (!descricao) {
-                descricao = "Depósito";
-            }
-
-        }
-
-
-        // =================================================
-        // PEGAR DEPÓSITOS
-        // =================================================
 
         const depositos =
-            obterDepositos();
+            lerLista(CHAVES.depositos);
 
 
-        // =================================================
-        // CRIAR DEPÓSITO
-        // =================================================
+        depositos.push({
 
-        const novoDeposito = {
+            id: Date.now(),
 
-            id:
-                Date.now(),
-
-            valor:
-                valor,
+            valor: valor,
 
             descricao:
-                descricao,
+                campoDescricao?.value.trim() ||
+                "Depósito",
 
             data:
                 new Date().toLocaleString(
                     "pt-BR"
                 )
 
-        };
+        });
 
 
-        // =================================================
-        // ADICIONAR
-        // =================================================
-
-        depositos.push(
-            novoDeposito
+        salvarLista(
+            CHAVES.depositos,
+            depositos
         );
 
 
-        // =================================================
-        // SALVAR
-        // =================================================
-
-        const salvou =
-            salvarDepositos(
-                depositos
-            );
-
-
-        if (!salvou) {
-
-            alert(
-                "❌ Não foi possível salvar o depósito."
-            );
-
-            return;
-
+        if (campoValor) {
+            campoValor.value = "";
         }
 
-
-        // =================================================
-        // LIMPAR
-        // =================================================
-
-        campoValor.value = "";
 
         if (campoDescricao) {
             campoDescricao.value = "";
         }
 
-
-        // =================================================
-        // ATUALIZAR
-        // =================================================
-
-        carregarDepositos();
-        atualizarResumo();
-
-
-        // =================================================
-        // MENSAGEM
-        // =================================================
 
         mostrarMensagem(
             "✅ Depósito registrado com sucesso!",
@@ -517,21 +254,12 @@
         );
 
 
-        console.log(
-            "✅ Depósito salvo:",
-            novoDeposito
-        );
+        carregarDepositos();
+
+        atualizarResumo();
 
     }
 
-
-    window.registrarDeposito =
-        registrarDeposito;
-
-
-    // =====================================================
-    // HISTÓRICO DE DEPÓSITOS
-    // =====================================================
 
     function carregarDepositos() {
 
@@ -541,230 +269,94 @@
             );
 
 
-        if (!lista) {
-
-            console.warn(
-                "⚠️ #listaDepositos não encontrado."
-            );
-
-            return;
-
-        }
+        if (!lista) return;
 
 
         const depositos =
-            obterDepositos();
+            lerLista(CHAVES.depositos)
+                .sort(
+                    (a, b) =>
+                        Number(b.id || 0) -
+                        Number(a.id || 0)
+                );
 
 
-        // =================================================
-        // NENHUM DEPÓSITO
-        // =================================================
-
-        if (depositos.length === 0) {
+        if (!depositos.length) {
 
             lista.innerHTML = `
-
-                <div class="vazio">
+                <p class="vazio">
                     📭 Nenhum depósito registrado.
-                </div>
-
+                </p>
             `;
 
             return;
-
         }
-
-
-        // =================================================
-        // ORDENAR
-        // =================================================
-
-        const ordenados =
-            [...depositos].sort(
-                function (a, b) {
-
-                    return (
-                        Number(b.id || 0) -
-                        Number(a.id || 0)
-                    );
-
-                }
-            );
 
 
         lista.innerHTML = "";
 
 
-        // =================================================
-        // MOSTRAR
-        // =================================================
+        depositos.forEach(deposito => {
 
-        ordenados.forEach(
-            function (deposito) {
-
-                const item =
-                    document.createElement(
-                        "div"
-                    );
+            const item =
+                document.createElement("div");
 
 
-                item.className =
-                    "deposito";
+            item.className =
+                "item item-linha";
 
 
-                item.style.display =
-                    "flex";
+            item.innerHTML = `
 
-                item.style.justifyContent =
-                    "space-between";
+                <div>
 
-                item.style.alignItems =
-                    "center";
+                    <strong class="valor">
+                        ${dinheiro(deposito.valor)}
+                    </strong>
 
-                item.style.gap =
-                    "15px";
+                    <div>
+                        ${escapeHTML(
+                            deposito.descricao ||
+                            "Depósito"
+                        )}
+                    </div>
 
-                item.style.padding =
-                    "15px";
+                    <small>
+                        📅 ${escapeHTML(
+                            deposito.data || ""
+                        )}
+                    </small>
 
-                item.style.marginBottom =
-                    "10px";
-
-                item.style.background =
-                    "#f5f5f5";
-
-                item.style.borderRadius =
-                    "10px";
-
-
-                // =================================================
-                // INFORMAÇÕES
-                // =================================================
-
-                const informacoes =
-                    document.createElement(
-                        "div"
-                    );
+                </div>
 
 
-                const valor =
-                    document.createElement(
-                        "strong"
-                    );
+                <button
+                    type="button"
+                    class="btn-excluir"
+                >
+                    🗑️ Excluir
+                </button>
+
+            `;
 
 
-                valor.textContent =
-                    formatarDinheiro(
-                        deposito.valor
-                    );
-
-
-                valor.style.fontSize =
-                    "20px";
-
-
-                const descricao =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                descricao.textContent =
-                    deposito.descricao ||
-                    "Depósito";
-
-
-                const data =
-                    document.createElement(
-                        "small"
-                    );
-
-
-                data.textContent =
-                    "📅 " +
-                    (
-                        deposito.data ||
-                        ""
-                    );
-
-
-                informacoes.appendChild(
-                    valor
-                );
-
-                informacoes.appendChild(
-                    document.createElement("br")
-                );
-
-                informacoes.appendChild(
-                    descricao
-                );
-
-                informacoes.appendChild(
-                    document.createElement("br")
-                );
-
-                informacoes.appendChild(
-                    data
-                );
-
-
-                // =================================================
-                // BOTÃO EXCLUIR
-                // =================================================
-
-                const botao =
-                    document.createElement(
-                        "button"
-                    );
-
-
-                botao.type =
-                    "button";
-
-
-                botao.className =
-                    "btn-excluir";
-
-
-                botao.textContent =
-                    "🗑️ Excluir";
-
-
-                botao.addEventListener(
+            item
+                .querySelector(".btn-excluir")
+                ?.addEventListener(
                     "click",
-                    function () {
-
+                    () =>
                         excluirDeposito(
                             deposito.id
-                        );
-
-                    }
+                        )
                 );
 
 
-                item.appendChild(
-                    informacoes
-                );
+            lista.appendChild(item);
 
-                item.appendChild(
-                    botao
-                );
-
-
-                lista.appendChild(
-                    item
-                );
-
-            }
-        );
+        });
 
     }
 
-
-    // =====================================================
-    // EXCLUIR DEPÓSITO
-    // =====================================================
 
     function excluirDeposito(id) {
 
@@ -773,103 +365,84 @@
                 "Tem certeza que deseja excluir este depósito?"
             )
         ) {
+
             return;
         }
 
 
-        let depositos =
-            obterDepositos();
+        const depositos =
+            lerLista(CHAVES.depositos)
+                .filter(
+                    deposito =>
+                        String(deposito.id) !==
+                        String(id)
+                );
 
 
-        depositos =
-            depositos.filter(
-                function (deposito) {
-
-                    return Number(
-                        deposito.id
-                    ) !== Number(id);
-
-                }
-            );
-
-
-        if (
-            !salvarDepositos(
-                depositos
-            )
-        ) {
-
-            alert(
-                "❌ Não foi possível excluir o depósito."
-            );
-
-            return;
-
-        }
+        salvarLista(
+            CHAVES.depositos,
+            depositos
+        );
 
 
         carregarDepositos();
+
         atualizarResumo();
 
     }
 
 
-    window.excluirDeposito =
-        excluirDeposito;
-
-
-    // =====================================================
+    // ==========================================
     // PRODUTOS
-    // =====================================================
+    // ==========================================
 
     function obterProdutos() {
 
-        try {
+        const produtos =
+            lerLista(CHAVES.produtos);
 
-            const dados =
-                localStorage.getItem(
-                    "produtosShalom"
-                );
 
-            if (!dados) {
-                return [];
-            }
+        if (produtos.length) {
 
-            const produtos =
-                JSON.parse(dados);
+            return produtos.map(produto => ({
 
-            return Array.isArray(produtos)
-                ? produtos
-                : [];
+                ...produto,
 
-        } catch (erro) {
+                observacao:
+                    produto.observacao || "",
 
-            console.error(
-                "❌ Erro nos produtos:",
-                erro
-            );
+                imagem:
+                    produto.imagem || ""
 
-            return [];
+            }));
 
         }
+
+
+        salvarLista(
+            CHAVES.produtos,
+            produtosPadrao
+        );
+
+
+        return [...produtosPadrao];
 
     }
 
 
-    // =====================================================
-    // ABRIR FORMULÁRIO PRODUTO
-    // =====================================================
+    // ==========================================
+    // ABRIR FORMULÁRIO DE PRODUTO
+    // ==========================================
 
-    function abrirFormularioProduto() {
+    function abrirFormularioProduto(produto = null) {
 
         const formulario =
             document.getElementById(
                 "formularioProduto"
             );
 
-        if (!formulario) {
-            return;
-        }
+
+        if (!formulario) return;
 
 
         formulario.classList.remove(
@@ -882,57 +455,88 @@
                 "produtoId"
             );
 
-        const nome =
+        const nomeProduto =
             document.getElementById(
                 "nomeProduto"
             );
 
-        const preco =
+        const precoProduto =
             document.getElementById(
                 "precoProduto"
             );
 
-        const estoque =
+        const estoqueProduto =
             document.getElementById(
                 "estoqueProduto"
             );
 
-        const imagem =
+        const observacaoProduto =
+            document.getElementById(
+                "observacaoProduto"
+            );
+
+        const imagemProduto =
             document.getElementById(
                 "imagemProduto"
             );
 
 
-        if (produtoId)
-            produtoId.value = "";
+        if (produtoId) {
 
-        if (nome)
-            nome.value = "";
+            produtoId.value =
+                produto?.id ?? "";
 
-        if (preco)
-            preco.value = "";
-
-        if (estoque)
-            estoque.value = "";
-
-        if (imagem)
-            imagem.value = "";
-
-
-        if (nome) {
-            nome.focus();
         }
+
+
+        if (nomeProduto) {
+
+            nomeProduto.value =
+                produto?.nome ?? "";
+
+        }
+
+
+        if (precoProduto) {
+
+            precoProduto.value =
+                produto?.preco ?? "";
+
+        }
+
+
+        if (estoqueProduto) {
+
+            estoqueProduto.value =
+                produto?.estoque ?? 0;
+
+        }
+
+
+        if (observacaoProduto) {
+
+            observacaoProduto.value =
+                produto?.observacao ?? "";
+
+        }
+
+
+        if (imagemProduto) {
+
+            imagemProduto.value =
+                produto?.imagem ?? "";
+
+        }
+
+
+        nomeProduto?.focus();
 
     }
 
 
-    window.abrirFormularioProduto =
-        abrirFormularioProduto;
-
-
-    // =====================================================
+    // ==========================================
     // FECHAR FORMULÁRIO
-    // =====================================================
+    // ==========================================
 
     function fecharFormularioProduto() {
 
@@ -941,95 +545,95 @@
                 "formularioProduto"
             );
 
-        if (formulario) {
 
-            formulario.classList.add(
-                "oculto"
-            );
+        formulario?.classList.add(
+            "oculto"
+        );
 
-        }
+
+        const campos = [
+
+            "produtoId",
+
+            "nomeProduto",
+
+            "precoProduto",
+
+            "estoqueProduto",
+
+            "observacaoProduto",
+
+            "imagemProduto"
+
+        ];
+
+
+        campos.forEach(id => {
+
+            const campo =
+                document.getElementById(id);
+
+
+            if (campo) {
+
+                campo.value = "";
+
+            }
+
+        });
 
     }
 
 
-    window.fecharFormularioProduto =
-        fecharFormularioProduto;
-
-
-    // =====================================================
+    // ==========================================
     // SALVAR PRODUTO
-    // =====================================================
+    // ==========================================
 
-    function salvarProduto() {
+    function salvarProduto(event) {
 
-        const idCampo =
-            document.getElementById(
-                "produtoId"
-            );
-
-        const nomeCampo =
-            document.getElementById(
-                "nomeProduto"
-            );
-
-        const precoCampo =
-            document.getElementById(
-                "precoProduto"
-            );
-
-        const estoqueCampo =
-            document.getElementById(
-                "estoqueProduto"
-            );
-
-        const imagemCampo =
-            document.getElementById(
-                "imagemProduto"
-            );
-
-
-        if (
-            !nomeCampo ||
-            !precoCampo ||
-            !estoqueCampo ||
-            !imagemCampo
-        ) {
-
-            alert(
-                "Erro: campos do produto não encontrados."
-            );
-
-            return;
-
-        }
+        event.preventDefault();
 
 
         const id =
-            idCampo
-                ? idCampo.value
-                : "";
+            document.getElementById(
+                "produtoId"
+            )?.value.trim() || "";
 
 
         const nome =
-            nomeCampo.value.trim();
+            document.getElementById(
+                "nomeProduto"
+            )?.value.trim() || "";
 
 
         const preco =
             Number(
                 String(
-                    precoCampo.value
+                    document.getElementById(
+                        "precoProduto"
+                    )?.value || ""
                 ).replace(",", ".")
             );
 
 
         const estoque =
             Number(
-                estoqueCampo.value
+                document.getElementById(
+                    "estoqueProduto"
+                )?.value || 0
             );
 
 
+        const observacao =
+            document.getElementById(
+                "observacaoProduto"
+            )?.value.trim() || "";
+
+
         const imagem =
-            imagemCampo.value.trim();
+            document.getElementById(
+                "imagemProduto"
+            )?.value.trim() || "";
 
 
         if (!nome) {
@@ -1039,7 +643,6 @@
             );
 
             return;
-
         }
 
 
@@ -1053,12 +656,11 @@
             );
 
             return;
-
         }
 
 
         if (
-            !Number.isFinite(estoque) ||
+            !Number.isInteger(estoque) ||
             estoque < 0
         ) {
 
@@ -1067,82 +669,85 @@
             );
 
             return;
-
         }
 
 
-        let produtos =
+        const produtos =
             obterProdutos();
 
 
+        // EDITAR
         if (id) {
 
-            const indice =
+            const index =
                 produtos.findIndex(
-                    function (produto) {
-
-                        return String(
-                            produto.id
-                        ) === String(id);
-
-                    }
+                    produto =>
+                        String(produto.id) ===
+                        String(id)
                 );
 
 
-            if (indice !== -1) {
+            if (index === -1) {
 
-                produtos[indice] = {
+                alert(
+                    "Produto não encontrado."
+                );
 
-                    ...produtos[indice],
-
-                    nome:
-                        nome,
-
-                    preco:
-                        preco,
-
-                    estoque:
-                        estoque,
-
-                    imagem:
-                        imagem
-
-                };
-
+                return;
             }
 
-        } else {
+
+            produtos[index] = {
+
+                ...produtos[index],
+
+                nome,
+
+                preco,
+
+                estoque,
+
+                observacao,
+
+                imagem
+
+            };
+
+        }
+
+        // NOVO
+        else {
 
             produtos.push({
 
                 id:
                     Date.now(),
 
-                nome:
-                    nome,
+                nome,
 
-                preco:
-                    preco,
+                preco,
 
-                estoque:
-                    estoque,
+                estoque,
 
-                imagem:
-                    imagem
+                observacao,
+
+                imagem
 
             });
 
         }
 
 
-        localStorage.setItem(
-            "produtosShalom",
-            JSON.stringify(produtos)
+        salvarLista(
+            CHAVES.produtos,
+            produtos
         );
 
 
         fecharFormularioProduto();
+
         carregarProdutos();
+
         atualizarResumo();
 
 
@@ -1153,13 +758,9 @@
     }
 
 
-    window.salvarProduto =
-        salvarProduto;
-
-
-    // =====================================================
-    // CARREGAR PRODUTOS
-    // =====================================================
+    // ==========================================
+    // MOSTRAR PRODUTOS
+    // ==========================================
 
     function carregarProdutos() {
 
@@ -1169,243 +770,162 @@
             );
 
 
-        if (!lista) {
-            return;
-        }
+        if (!lista) return;
 
 
         const produtos =
             obterProdutos();
 
 
-        if (produtos.length === 0) {
+        if (!produtos.length) {
 
             lista.innerHTML = `
-
                 <p class="vazio">
                     Nenhum produto cadastrado.
                 </p>
-
             `;
 
             return;
-
         }
 
 
         lista.innerHTML = "";
 
 
-        produtos.forEach(
-            function (produto) {
+        produtos.forEach(produto => {
 
-                const item =
-                    document.createElement(
-                        "div"
-                    );
+            const item =
+                document.createElement("div");
 
 
-                item.className =
-                    "produto";
+            item.className =
+                "item item-linha";
 
 
-                const imagem =
-                    produto.imagem
-                        ? `
-
-                            <img
-                                src="${escapeAttribute(produto.imagem)}"
-                                alt="${escapeAttribute(produto.nome)}"
-                                style="
-                                    width:70px;
-                                    height:70px;
-                                    object-fit:contain;
-                                    border-radius:8px;
-                                "
-                                onerror="this.style.display='none'"
-                            >
-
-                        `
-                        : "";
+            const imagem =
+                produto.imagem
+                    ? `
+                        <img
+                            class="produto-imagem"
+                            src="${escapeHTML(
+                                produto.imagem
+                            )}"
+                            alt="${escapeHTML(
+                                produto.nome
+                            )}"
+                        >
+                    `
+                    : "";
 
 
-                item.innerHTML = `
+            const observacao =
+                produto.observacao
+                    ? `
+                        <div class="observacao-produto">
 
-                    <div
-                        style="
-                            display:flex;
-                            align-items:center;
-                            gap:15px;
-                        "
-                    >
-
-                        ${imagem}
-
-                        <div>
-
+                            📝
                             <strong>
-                                ${escapeHTML(produto.nome)}
+                                Obs.:
                             </strong>
 
-                            <br>
-
-                            <span>
-                                Preço:
-                                ${formatarDinheiro(produto.preco)}
-                            </span>
-
-                            <br>
-
-                            <span>
-                                Estoque:
-                                ${Number(produto.estoque) || 0}
-                            </span>
+                            ${escapeHTML(
+                                produto.observacao
+                            )}
 
                         </div>
+                    `
+                    : "";
+
+
+            item.innerHTML = `
+
+                <div class="produto-conteudo">
+
+                    ${imagem}
+
+                    <div>
+
+                        <strong>
+                            ${escapeHTML(
+                                produto.nome
+                            )}
+                        </strong>
+
+                        <div>
+                            Preço:
+                            ${dinheiro(
+                                produto.preco
+                            )}
+                        </div>
+
+                        <small>
+                            Estoque:
+                            ${Number(
+                                produto.estoque
+                            ) || 0}
+                        </small>
+
+                        ${observacao}
 
                     </div>
 
-                    <div class="acoes">
-
-                        <button
-                            type="button"
-                            class="btn-editar"
-                            onclick="editarProduto(${Number(produto.id)})"
-                        >
-                            ✏️ Editar
-                        </button>
-
-                        <button
-                            type="button"
-                            class="btn-excluir"
-                            onclick="excluirProduto(${Number(produto.id)})"
-                        >
-                            🗑️ Excluir
-                        </button>
-
-                    </div>
-
-                `;
+                </div>
 
 
-                lista.appendChild(
-                    item
+                <div class="acoes">
+
+                    <button
+                        type="button"
+                        class="btn-editar"
+                    >
+                        ✏️ Editar
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn-excluir"
+                    >
+                        🗑️ Excluir
+                    </button>
+
+                </div>
+
+            `;
+
+
+            item
+                .querySelector(".btn-editar")
+                ?.addEventListener(
+                    "click",
+                    () =>
+                        abrirFormularioProduto(
+                            produto
+                        )
                 );
 
-            }
-        );
+
+            item
+                .querySelector(".btn-excluir")
+                ?.addEventListener(
+                    "click",
+                    () =>
+                        excluirProduto(
+                            produto.id
+                        )
+                );
+
+
+            lista.appendChild(item);
+
+        });
 
     }
 
 
-    // =====================================================
-    // EDITAR PRODUTO
-    // =====================================================
-
-    function editarProduto(id) {
-
-        const produtos =
-            obterProdutos();
-
-
-        const produto =
-            produtos.find(
-                function (item) {
-
-                    return Number(
-                        item.id
-                    ) === Number(id);
-
-                }
-            );
-
-
-        if (!produto) {
-
-            alert(
-                "Produto não encontrado."
-            );
-
-            return;
-
-        }
-
-
-        const produtoId =
-            document.getElementById(
-                "produtoId"
-            );
-
-        const nome =
-            document.getElementById(
-                "nomeProduto"
-            );
-
-        const preco =
-            document.getElementById(
-                "precoProduto"
-            );
-
-        const estoque =
-            document.getElementById(
-                "estoqueProduto"
-            );
-
-        const imagem =
-            document.getElementById(
-                "imagemProduto"
-            );
-
-        const formulario =
-            document.getElementById(
-                "formularioProduto"
-            );
-
-
-        if (produtoId)
-            produtoId.value =
-                produto.id;
-
-
-        if (nome)
-            nome.value =
-                produto.nome || "";
-
-
-        if (preco)
-            preco.value =
-                produto.preco || 0;
-
-
-        if (estoque)
-            estoque.value =
-                produto.estoque || 0;
-
-
-        if (imagem)
-            imagem.value =
-                produto.imagem || "";
-
-
-        if (formulario)
-            formulario.classList.remove(
-                "oculto"
-            );
-
-
-        if (nome)
-            nome.focus();
-
-    }
-
-
-    window.editarProduto =
-        editarProduto;
-
-
-    // =====================================================
+    // ==========================================
     // EXCLUIR PRODUTO
-    // =====================================================
+    // ==========================================
 
     function excluirProduto(id) {
 
@@ -1414,83 +934,36 @@
                 "Tem certeza que deseja excluir este produto?"
             )
         ) {
+
             return;
         }
 
 
-        let produtos =
-            obterProdutos();
+        const produtos =
+            obterProdutos()
+                .filter(
+                    produto =>
+                        String(produto.id) !==
+                        String(id)
+                );
 
 
-        produtos =
-            produtos.filter(
-                function (produto) {
-
-                    return Number(
-                        produto.id
-                    ) !== Number(id);
-
-                }
-            );
-
-
-        localStorage.setItem(
-            "produtosShalom",
-            JSON.stringify(produtos)
+        salvarLista(
+            CHAVES.produtos,
+            produtos
         );
 
 
         carregarProdutos();
+
         atualizarResumo();
 
     }
 
 
-    window.excluirProduto =
-        excluirProduto;
-
-
-    // =====================================================
+    // ==========================================
     // CLIENTES
-    // =====================================================
-
-    function obterClientes() {
-
-        try {
-
-            const dados =
-                localStorage.getItem(
-                    "usuariosShalom"
-                );
-
-            if (!dados) {
-                return [];
-            }
-
-            const clientes =
-                JSON.parse(dados);
-
-            return Array.isArray(clientes)
-                ? clientes
-                : [];
-
-        } catch (erro) {
-
-            console.error(
-                "❌ Erro nos clientes:",
-                erro
-            );
-
-            return [];
-
-        }
-
-    }
-
-
-    // =====================================================
-    // CARREGAR CLIENTES
-    // =====================================================
+    // ==========================================
 
     function carregarClientes() {
 
@@ -1500,101 +973,519 @@
             );
 
 
-        if (!lista) {
-            return;
-        }
+        if (!lista) return;
 
 
         const clientes =
-            obterClientes();
+            lerLista(
+                CHAVES.usuarios
+            )
+            .filter(
+                usuario =>
+                    usuario.tipo !== "admin"
+            );
 
 
-        if (clientes.length === 0) {
+        if (!clientes.length) {
 
             lista.innerHTML = `
-
                 <p class="vazio">
                     Nenhum cliente cadastrado.
                 </p>
-
             `;
 
             return;
-
         }
 
 
         lista.innerHTML = "";
 
 
-        clientes.forEach(
-            function (cliente) {
+        clientes.forEach(cliente => {
 
-                const item =
-                    document.createElement(
-                        "div"
-                    );
+            const item =
+                document.createElement("div");
 
 
-                item.className =
-                    "cliente";
+            item.className = "item";
 
 
-                const nome =
-                    document.createElement(
-                        "strong"
-                    );
+            item.innerHTML = `
 
-
-                nome.textContent =
-                    "👤 " +
-                    (
+                <strong>
+                    👤 ${escapeHTML(
                         cliente.nome ||
                         "Cliente"
-                    );
+                    )}
+                </strong>
 
-
-                const email =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                email.textContent =
-                    "📧 " +
-                    (
+                <div>
+                    📧 ${escapeHTML(
                         cliente.email ||
                         ""
-                    );
+                    )}
+                </div>
+
+            `;
 
 
-                item.appendChild(
-                    nome
-                );
+            lista.appendChild(item);
 
-                item.appendChild(
-                    email
-                );
-
-
-                lista.appendChild(
-                    item
-                );
-
-            }
-        );
+        });
 
     }
 
 
-    // =====================================================
-    // ATUALIZAR RESUMO
-    // =====================================================
+    // ==========================================
+    // PEDIDOS DOS CLIENTES
+    // ==========================================
+
+    function carregarPedidos() {
+
+        const lista =
+            document.getElementById(
+                "listaPedidos"
+            );
+
+
+        if (!lista) {
+
+            console.warn(
+                "⚠️ #listaPedidos não encontrado no admin.html."
+            );
+
+            return;
+        }
+
+
+        const pedidos =
+            lerLista(
+                CHAVES.pedidos
+            )
+            .sort(
+                (a, b) =>
+                    Number(b.id || 0) -
+                    Number(a.id || 0)
+            );
+
+
+        // --------------------------------------
+        // NENHUM PEDIDO
+        // --------------------------------------
+
+        if (!pedidos.length) {
+
+            lista.innerHTML = `
+
+                <div class="vazio">
+
+                    🛒 Nenhum pedido registrado.
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        lista.innerHTML = "";
+
+
+        // --------------------------------------
+        // PEDIDOS
+        // --------------------------------------
+
+        pedidos.forEach(pedido => {
+
+            const item =
+                document.createElement("div");
+
+
+            item.className =
+                "item pedido-admin";
+
+
+            // ----------------------------------
+            // PRODUTOS
+            // ----------------------------------
+
+            let itensHTML = "";
+
+
+            if (
+                Array.isArray(
+                    pedido.produtos
+                )
+            ) {
+
+                itensHTML =
+                    pedido.produtos
+                        .map(produto => {
+
+                            const quantidade =
+                                Number(
+                                    produto.quantidade
+                                ) || 0;
+
+
+                            const preco =
+                                Number(
+                                    produto.preco
+                                ) || 0;
+
+
+                            const subtotal =
+                                Number(
+                                    produto.subtotal
+                                ) ||
+                                preco * quantidade;
+
+
+                            return `
+
+                                <li>
+
+                                    ${escapeHTML(
+                                        produto.nome ||
+                                        "Produto"
+                                    )}
+
+                                    x${quantidade}
+
+                                    -
+
+                                    ${dinheiro(
+                                        subtotal
+                                    )}
+
+                                </li>
+
+                            `;
+
+                        })
+                        .join("");
+
+            }
+
+
+            // ----------------------------------
+            // OBSERVAÇÃO
+            // ----------------------------------
+
+            const observacao =
+                pedido.observacao ||
+                pedido.obs ||
+                pedido.observacaoPedido ||
+                "";
+
+
+            // ----------------------------------
+            // TELEFONE
+            // ----------------------------------
+
+            const telefone =
+                pedido.telefone ||
+                pedido.celular ||
+                "";
+
+
+            // ----------------------------------
+            // ENDEREÇO
+            // ----------------------------------
+
+            const endereco =
+                pedido.endereco ||
+                "";
+
+
+            const numero =
+                pedido.numero ||
+                "";
+
+
+            const cidade =
+                pedido.cidade ||
+                "";
+
+
+            // ----------------------------------
+            // CLIENTE
+            // ----------------------------------
+
+            const nomeCliente =
+                pedido.nome ||
+                pedido.nomeCliente ||
+                "Cliente";
+
+
+            // ----------------------------------
+            // PAGAMENTO
+            // ----------------------------------
+
+            const pagamento =
+                pedido.pagamento ||
+                pedido.formaPagamento ||
+                "Não informado";
+
+
+            // ----------------------------------
+            // DATA
+            // ----------------------------------
+
+            const data =
+                pedido.data ||
+                pedido.dataPedido ||
+                "";
+
+
+            // ----------------------------------
+            // HTML DO PEDIDO
+            // ----------------------------------
+
+            item.innerHTML = `
+
+                <div class="item-linha">
+
+                    <strong>
+
+                        🛒 Pedido
+                        #${escapeHTML(
+                            pedido.id
+                        )}
+
+                    </strong>
+
+
+                    <strong class="valor">
+
+                        ${dinheiro(
+                            pedido.total
+                        )}
+
+                    </strong>
+
+                </div>
+
+
+                <hr>
+
+
+                <div>
+
+                    👤
+
+                    <strong>
+                        Cliente:
+                    </strong>
+
+                    ${escapeHTML(
+                        nomeCliente
+                    )}
+
+                </div>
+
+
+                ${
+                    telefone
+                        ? `
+                            <div>
+
+                                📞
+
+                                <strong>
+                                    Telefone:
+                                </strong>
+
+                                ${escapeHTML(
+                                    telefone
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    pedido.email
+                        ? `
+                            <div>
+
+                                📧
+
+                                <strong>
+                                    E-mail:
+                                </strong>
+
+                                ${escapeHTML(
+                                    pedido.email
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    endereco
+                        ? `
+                            <div>
+
+                                🏠
+
+                                <strong>
+                                    Endereço:
+                                </strong>
+
+                                ${escapeHTML(
+                                    endereco
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    numero
+                        ? `
+                            <div>
+
+                                🔢
+
+                                <strong>
+                                    Número:
+                                </strong>
+
+                                ${escapeHTML(
+                                    numero
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    cidade
+                        ? `
+                            <div>
+
+                                📍
+
+                                <strong>
+                                    Cidade:
+                                </strong>
+
+                                ${escapeHTML(
+                                    cidade
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                <div>
+
+                    💳
+
+                    <strong>
+                        Pagamento:
+                    </strong>
+
+                    ${escapeHTML(
+                        pagamento
+                    )}
+
+                </div>
+
+
+                ${
+                    data
+                        ? `
+                            <div>
+
+                                📅
+
+                                <strong>
+                                    Data:
+                                </strong>
+
+                                ${escapeHTML(
+                                    data
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    observacao
+                        ? `
+                            <div class="observacao-pedido">
+
+                                📝
+
+                                <strong>
+                                    Observação:
+                                </strong>
+
+                                ${escapeHTML(
+                                    observacao
+                                )}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                <div class="pedido-produtos">
+
+                    <strong>
+                        📦 Produtos:
+                    </strong>
+
+
+                    <ul class="pedido-itens">
+
+                        ${
+                            itensHTML ||
+                            "<li>Nenhum produto informado.</li>"
+                        }
+
+                    </ul>
+
+                </div>
+
+            `;
+
+
+            lista.appendChild(item);
+
+        });
+
+    }
+
+
+    // ==========================================
+    // RESUMO
+    // ==========================================
 
     function atualizarResumo() {
 
         const depositos =
-            obterDepositos();
+            lerLista(
+                CHAVES.depositos
+            );
 
 
         const produtos =
@@ -1602,21 +1493,23 @@
 
 
         const clientes =
-            obterClientes();
+            lerLista(
+                CHAVES.usuarios
+            )
+            .filter(
+                usuario =>
+                    usuario.tipo !== "admin"
+            );
 
-
-        // =================================================
-        // SALDO
-        // =================================================
 
         const saldo =
             depositos.reduce(
-                function (
-                    total,
+                (
+                    soma,
                     deposito
-                ) {
+                ) => {
 
-                    return total +
+                    return soma +
                         (
                             Number(
                                 deposito.valor
@@ -1634,174 +1527,89 @@
             );
 
 
-        if (saldoElemento) {
-
-            saldoElemento.textContent =
-                formatarDinheiro(
-                    saldo
-                );
-
-        }
-
-
-        // =================================================
-        // PRODUTOS
-        // =================================================
-
-        const totalProdutos =
+        const produtosElemento =
             document.getElementById(
                 "totalProdutos"
             );
 
 
-        if (totalProdutos) {
-
-            totalProdutos.textContent =
-                produtos.length;
-
-        }
-
-
-        // =================================================
-        // CLIENTES
-        // =================================================
-
-        const totalClientes =
+        const clientesElemento =
             document.getElementById(
                 "totalClientes"
             );
 
 
-        if (totalClientes) {
-
-            totalClientes.textContent =
-                clientes.length;
-
-        }
-
-
-        // =================================================
-        // DEPÓSITOS
-        // =================================================
-
-        const totalDepositos =
+        const depositosElemento =
             document.getElementById(
                 "totalDepositos"
             );
 
 
-        if (totalDepositos) {
+        if (saldoElemento) {
 
-            totalDepositos.textContent =
+            saldoElemento.textContent =
+                dinheiro(saldo);
+
+        }
+
+
+        if (produtosElemento) {
+
+            produtosElemento.textContent =
+                produtos.length;
+
+        }
+
+
+        if (clientesElemento) {
+
+            clientesElemento.textContent =
+                clientes.length;
+
+        }
+
+
+        if (depositosElemento) {
+
+            depositosElemento.textContent =
                 depositos.length;
 
         }
 
-
-        // =================================================
-        // CORRIGIR "DEPÓSITOS 0" MESMO SEM ID
-        // =================================================
-
-        if (!totalDepositos) {
-
-            const elementos =
-                document.querySelectorAll(
-                    "h1, h2, h3, h4, h5, h6, div, span, p"
-                );
-
-
-            elementos.forEach(
-                function (elemento) {
-
-                    if (
-                        elemento.children.length !== 0
-                    ) {
-                        return;
-                    }
-
-
-                    const texto =
-                        (
-                            elemento.textContent ||
-                            ""
-                        ).trim();
-
-
-                    if (
-                        /^📇?\s*Depósitos\s+\d+$/.test(
-                            texto
-                        )
-                        ||
-                        /^💳\s*Depósitos\s+\d+$/.test(
-                            texto
-                        )
-                        ||
-                        /^Depósito\s+\d+$/.test(
-                            texto
-                        )
-                    ) {
-
-                        const novoTexto =
-                            texto.replace(
-                                /\d+$/,
-                                String(
-                                    depositos.length
-                                )
-                            );
-
-
-                        elemento.textContent =
-                            novoTexto;
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        console.log(
-            "📊 RESUMO ATUALIZADO:",
-            {
-                saldo:
-                    saldo,
-
-                produtos:
-                    produtos.length,
-
-                clientes:
-                    clientes.length,
-
-                depositos:
-                    depositos.length
-            }
-        );
-
     }
 
 
-    // =====================================================
+    // ==========================================
     // SAIR
-    // =====================================================
+    // ==========================================
 
     function sair() {
 
-        localStorage.removeItem(
-            "tipoUsuario"
-        );
+        const chaves = [
 
-        localStorage.removeItem(
-            "usuarioNome"
-        );
+            "tipoUsuario",
 
-        localStorage.removeItem(
-            "clienteNome"
-        );
+            "usuarioLogado",
 
-        localStorage.removeItem(
+            "usuarioNome",
+
+            "nomeUsuario",
+
+            "clienteNome",
+
             "clienteEmail"
-        );
+
+        ];
+
+
+        chaves.forEach(chave => {
+
+            localStorage.removeItem(chave);
+
+        });
+
+
+        sessionStorage.clear();
 
 
         window.location.href =
@@ -1810,38 +1618,107 @@
     }
 
 
-    window.sair =
-        sair;
+    // ==========================================
+    // INICIALIZAÇÃO
+    // ==========================================
+
+    function iniciarAdmin() {
+
+        // DEPÓSITOS
+
+        document
+            .getElementById(
+                "depositoForm"
+            )
+            ?.addEventListener(
+                "submit",
+                registrarDeposito
+            );
 
 
-    // =====================================================
-    // SEGURANÇA
-    // =====================================================
+        // NOVO PRODUTO
 
-    function escapeHTML(valor) {
+        document
+            .getElementById(
+                "btnNovoProduto"
+            )
+            ?.addEventListener(
+                "click",
+                () =>
+                    abrirFormularioProduto()
+            );
 
-        return String(
-            valor ?? ""
-        )
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+
+        // CANCELAR
+
+        document
+            .getElementById(
+                "btnCancelarProduto"
+            )
+            ?.addEventListener(
+                "click",
+                fecharFormularioProduto
+            );
+
+
+        // FORMULÁRIO
+
+        document
+            .getElementById(
+                "formularioProduto"
+            )
+            ?.addEventListener(
+                "submit",
+                salvarProduto
+            );
+
+
+        // SAIR
+
+        document
+            .getElementById(
+                "btnSair"
+            )
+            ?.addEventListener(
+                "click",
+                sair
+            );
+
+
+        // CARREGAR DADOS
+
+        carregarDepositos();
+
+        carregarProdutos();
+
+        carregarClientes();
+
+        carregarPedidos();
+
+        atualizarResumo();
 
     }
 
 
-    function escapeAttribute(valor) {
+    // ==========================================
+    // DOM PRONTO
+    // ==========================================
 
-        return String(
-            valor ?? ""
-        )
-            .replace(/&/g, "&amp;")
-            .replace(/"/g, "&quot;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            iniciarAdmin
+        );
+
+    } else {
+
+        iniciarAdmin();
 
     }
+
 
 })();

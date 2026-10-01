@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,102 +9,163 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Painel Administrativo - Shalom</title>
+    <title>Painel Administrativo - Loja Shalom</title>
 
-    <link rel="stylesheet" href="admin.css">
-
+    <link
+        rel="stylesheet"
+        href="admin.css"
+    >
 </head>
+
 
 <body>
 
-    <header>
+    <!-- ==========================================
+         CABEÇALHO
+    =========================================== -->
 
-        <div class="logo">
-            📦 Loja Shalom
-            <span>Admin</span>
-        </div>
+    <header class="cabecalho">
 
-        <button
-            class="sair"
-            onclick="sair()"
-        >
-            🚪 Sair
-        </button>
-
-    </header>
-
-
-    <main>
-
-        <div class="titulo">
+        <div class="logo-area">
 
             <h1>
-                📊 Painel Administrativo
+                📦 Loja Shalom
             </h1>
 
             <p>
-                Gerencie sua loja e seus depósitos.
+                Painel Administrativo
             </p>
 
         </div>
 
 
-        <!-- CARDS -->
+        <!-- RELÓGIO -->
 
-        <section class="cards">
+        <div class="relogio-loja">
 
-            <div class="card">
+            <div
+                id="relogioBrasil"
+                class="hora-loja"
+            >
+                00:00:00
+            </div>
 
-                <div class="icone">
-                    💰
-                </div>
+            <div
+                id="dataBrasil"
+                class="data-loja"
+            >
+                Carregando...
+            </div>
+
+        </div>
+
+
+        <!-- BOTÃO SAIR -->
+
+        <div class="usuario-area">
+
+            <span>
+                👨‍💼 Administrador
+            </span>
+
+            <button
+                id="btnSair"
+                class="btn-sair"
+                type="button"
+            >
+                🚪 Sair
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ==========================================
+         CONTEÚDO PRINCIPAL
+    =========================================== -->
+
+    <main class="container">
+
+
+        <!-- ======================================
+             RESUMO
+        ======================================= -->
+
+        <section class="resumo">
+
+            <div class="resumo-card">
+
+                <span>💰</span>
 
                 <div>
-                    <span>
+
+                    <small>
                         Saldo
-                    </span>
+                    </small>
 
                     <strong id="saldo">
                         R$ 0,00
                     </strong>
+
                 </div>
 
             </div>
 
 
-            <div class="card">
+            <div class="resumo-card">
 
-                <div class="icone">
-                    📦
-                </div>
+                <span>📦</span>
 
                 <div>
-                    <span>
+
+                    <small>
                         Produtos
-                    </span>
+                    </small>
 
-                    <strong>
-                        4
-                    </strong>
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="icone">
-                    💳
-                </div>
-
-                <div>
-                    <span>
-                        Depósitos
-                    </span>
-
-                    <strong id="quantidadeDepositos">
+                    <strong id="totalProdutos">
                         0
                     </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="resumo-card">
+
+                <span>👥</span>
+
+                <div>
+
+                    <small>
+                        Clientes
+                    </small>
+
+                    <strong id="totalClientes">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="resumo-card">
+
+                <span>💳</span>
+
+                <div>
+
+                    <small>
+                        Depósitos
+                    </small>
+
+                    <strong id="totalDepositos">
+                        0
+                    </strong>
+
                 </div>
 
             </div>
@@ -113,58 +173,75 @@
         </section>
 
 
-        <!-- DEPÓSITO -->
 
-        <section class="painel">
+        <!-- ======================================
+             DEPÓSITO
+        ======================================= -->
+
+        <section class="card">
 
             <h2>
                 💰 Registrar depósito
             </h2>
 
+
             <form id="depositoForm">
 
-                <label for="valor">
+                <label for="valorDeposito">
                     Valor do depósito
                 </label>
 
                 <input
                     type="number"
-                    id="valor"
+                    id="valorDeposito"
                     min="0.01"
                     step="0.01"
-                    placeholder="Ex: 500,00"
+                    placeholder="Ex.: 500,00"
                     required
                 >
 
 
-                <label for="descricao">
+                <label for="descricaoDeposito">
                     Descrição
                 </label>
 
                 <input
                     type="text"
-                    id="descricao"
-                    placeholder="Ex: Depósito inicial"
-                    required
+                    id="descricaoDeposito"
+                    placeholder="Ex.: Depósito inicial"
                 >
 
 
-                <button type="submit">
+                <button
+                    class="btn-principal"
+                    type="submit"
+                >
                     + Registrar depósito
                 </button>
 
             </form>
 
+
+            <p
+                id="mensagemDeposito"
+                class="mensagem"
+                aria-live="polite"
+            ></p>
+
         </section>
 
 
-        <!-- HISTÓRICO -->
 
-        <section class="painel">
+        <!-- ======================================
+             HISTÓRICO DE DEPÓSITOS
+        ======================================= -->
+
+        <section class="card">
 
             <h2>
-                🧾 Histórico de depósitos
+                📋 Histórico de depósitos
             </h2>
+
 
             <div id="listaDepositos">
 
@@ -177,44 +254,208 @@
         </section>
 
 
-        <!-- PRODUTOS -->
 
-        <section class="painel">
+        <!-- ======================================
+             PRODUTOS
+        ======================================= -->
 
-            <h2>
-                📦 Produtos da loja
-            </h2>
+        <section class="card">
 
-            <div class="produtos-admin">
+            <div class="titulo-linha">
 
-                <div>
-                    📦 Caixa de Papelão
-                    <strong>R$ 10,90</strong>
+                <h2>
+                    📦 Gerenciar produtos
+                </h2>
+
+
+                <button
+                    id="btnNovoProduto"
+                    class="btn-principal"
+                    type="button"
+                >
+                    + Novo produto
+                </button>
+
+            </div>
+
+
+
+            <!-- FORMULÁRIO DE PRODUTO -->
+
+            <form
+                id="formularioProduto"
+                class="form-produto oculto"
+            >
+
+                <input
+                    type="hidden"
+                    id="produtoId"
+                >
+
+
+                <label for="nomeProduto">
+                    Nome do produto
+                </label>
+
+                <input
+                    type="text"
+                    id="nomeProduto"
+                    placeholder="Ex.: Copo descartável"
+                    required
+                >
+
+
+                <label for="precoProduto">
+                    Preço
+                </label>
+
+                <input
+                    type="number"
+                    id="precoProduto"
+                    min="0"
+                    step="0.01"
+                    placeholder="Ex.: 10,90"
+                    required
+                >
+
+
+                <label for="estoqueProduto">
+                    Estoque
+                </label>
+
+                <input
+                    type="number"
+                    id="estoqueProduto"
+                    min="0"
+                    step="1"
+                    placeholder="Ex.: 100"
+                    required
+                >
+
+
+                <!-- UMA ÚNICA OBSERVAÇÃO -->
+
+                <label for="observacaoProduto">
+                    Observação do produto
+                </label>
+
+                <textarea
+                    id="observacaoProduto"
+                    rows="3"
+                    placeholder="Ex.: Pacote com 100 unidades, tamanho, material, cor..."
+                ></textarea>
+
+
+                <label for="imagemProduto">
+                    Imagem
+                </label>
+
+                <input
+                    type="text"
+                    id="imagemProduto"
+                    placeholder="Ex.: copos.png.webp"
+                >
+
+
+                <div class="botoes">
+
+                    <button
+                        class="btn-principal"
+                        type="submit"
+                    >
+                        💾 Salvar produto
+                    </button>
+
+
+                    <button
+                        id="btnCancelarProduto"
+                        class="btn-cancelar"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
                 </div>
 
-                <div>
-                    🛍️ Sacola Kraft
-                    <strong>R$ 10,50</strong>
-                </div>
+            </form>
 
-                <div>
-                    🥡 Embalagem Delivery
-                    <strong>R$ 10,00</strong>
-                </div>
 
-                <div>
-                    🥤 Copo Descartável
-                    <strong>R$ 10,90</strong>
-                </div>
+
+            <!-- LISTA DE PRODUTOS -->
+
+            <div id="listaProdutos">
+
+                <p class="vazio">
+                    Nenhum produto cadastrado.
+                </p>
 
             </div>
 
         </section>
 
+
+
+        <!-- ======================================
+             PEDIDOS DOS CLIENTES
+        ======================================= -->
+
+        <section class="card">
+
+            <div class="titulo-linha">
+
+                <h2>
+                    🧾 Pedidos dos clientes
+                </h2>
+
+            </div>
+
+
+            <div id="listaPedidos">
+
+                <p class="vazio">
+                    Nenhum pedido registrado.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ======================================
+             CLIENTES
+        ======================================= -->
+
+        <section class="card">
+
+            <h2>
+                👥 Clientes cadastrados
+            </h2>
+
+
+            <div id="listaClientes">
+
+                <p class="vazio">
+                    Nenhum cliente cadastrado.
+                </p>
+
+            </div>
+
+        </section>
+
+
     </main>
 
 
+
+    <!-- ==========================================
+         JAVASCRIPT
+    =========================================== -->
+
     <script src="admin.js"></script>
+
+    <script src="relogio.js"></script>
+
 
 </body>
 
