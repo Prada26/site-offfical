@@ -12,9 +12,24 @@
 
     <title>Comprar - Loja Shalom</title>
 
+
+    <!-- ==========================================
+         CSS DA LOJA
+    =========================================== -->
+
     <link
         rel="stylesheet"
         href="comprar.css"
+    >
+
+
+    <!-- ==========================================
+         CSS DO CHATBOT
+    =========================================== -->
+
+    <link
+        rel="stylesheet"
+        href="chatbot.css"
     >
 
 </head>
@@ -88,7 +103,6 @@
             </button>
 
         </div>
-
 
     </header>
 
@@ -203,10 +217,175 @@
 
 
     <!-- ==========================================
+         CHATBOT - LOJA SHALOM
+    =========================================== -->
+
+    <div id="chatbot">
+
+
+        <!-- ======================================
+             BOTÃO PARA ABRIR
+        ======================================= -->
+
+        <button
+            id="chatbotAbrir"
+            type="button"
+            aria-label="Abrir assistente"
+        >
+            💬
+        </button>
+
+
+
+        <!-- ======================================
+             JANELA DO CHAT
+        ======================================= -->
+
+        <div id="chatbotJanela">
+
+
+            <!-- ==================================
+                 CABEÇALHO DO CHAT
+            =================================== -->
+
+            <div class="chatbotCabecalho">
+
+                <div>
+
+                    <strong>
+                        🤖 Assistente Shalom
+                    </strong>
+
+                    <small>
+                        Estou aqui para ajudar
+                    </small>
+
+                </div>
+
+
+                <button
+                    id="chatbotFechar"
+                    type="button"
+                    aria-label="Fechar chat"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 MENSAGENS
+            =================================== -->
+
+            <div id="chatbotMensagens">
+
+
+                <div class="botMensagem">
+
+                    👋 Olá! Sou o assistente
+                    da Loja Shalom.
+
+                    <br><br>
+
+                    Posso ajudar com produtos,
+                    preços, compras, pagamentos
+                    e pedidos.
+
+                    <br><br>
+
+                    O que você gostaria de saber?
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ==================================
+                 SUGESTÕES
+            =================================== -->
+
+            <div class="chatbotSugestoes">
+
+
+                <button
+                    type="button"
+                    data-pergunta="produtos"
+                >
+                    📦 Produtos
+                </button>
+
+
+                <button
+                    type="button"
+                    data-pergunta="precos"
+                >
+                    💰 Preços
+                </button>
+
+
+                <button
+                    type="button"
+                    data-pergunta="pagamento"
+                >
+                    💳 Pagamento
+                </button>
+
+
+                <button
+                    type="button"
+                    data-pergunta="pedido"
+                >
+                    📋 Pedido
+                </button>
+
+
+            </div>
+
+
+
+            <!-- ==================================
+                 CAMPO DE MENSAGEM
+            =================================== -->
+
+            <form id="chatbotForm">
+
+
+                <input
+                    type="text"
+                    id="chatbotInput"
+                    placeholder="Digite sua dúvida..."
+                    autocomplete="off"
+                >
+
+
+                <button
+                    type="submit"
+                    aria-label="Enviar mensagem"
+                >
+                    ➤
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==========================================
          JAVASCRIPT
     =========================================== -->
 
     <script src="comprar.js"></script>
+
+    <script src="chatbot.js"></script>
 
     <script src="relogio.js"></script>
 

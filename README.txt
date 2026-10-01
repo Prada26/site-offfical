@@ -10,7 +10,7 @@ finalizacao.html       Confirmação do pedido
 admin.html/js/css      Painel administrativo
 
 LOGIN DO ADMINISTRADOR
-E-mail: admin@shalom.com
+E-mail: admin@shalom.comadmin@shalom.com
 Senha: 123456
 
 DADOS USADOS NO LOCALSTORAGE

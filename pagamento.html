@@ -10,502 +10,220 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Finalizar pedido - Loja Shalom</title>
+    <title>
+        Pagamento - Loja Shalom
+    </title>
 
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 30px 15px;
-            background: #f1f5f9;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #111827;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        h1 {
-            margin: 0 0 5px;
-            color: #0645ad;
-            font-size: 32px;
-        }
-
-        .subtitulo {
-            margin: 0 0 25px;
-            color: #64748b;
-            font-size: 16px;
-        }
-
-        /* ==============================
-           RESUMO DO PEDIDO
-        ============================== */
-
-        .resumo-pedido {
-            background: #f8fafc;
-            border: 1px solid #d7e0ea;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
-        }
-
-        .item-pedido {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .item-pedido:last-child {
-            border-bottom: none;
-        }
-
-        .item-info {
-            flex: 1;
-        }
-
-        .item-nome {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .item-quantidade {
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .item-observacao {
-            display: block;
-            margin-top: 5px;
-            color: #475569;
-            font-size: 14px;
-        }
-
-        .item-preco {
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        .total-pedido {
-            margin-top: 10px;
-            padding-top: 15px;
-            border-top: 2px solid #cbd5e1;
-            display: flex;
-            justify-content: space-between;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        /* ==============================
-           FORMULÁRIO
-        ============================== */
-
-        form {
-            width: 100%;
-        }
-
-        label {
-            display: block;
-            margin: 16px 0 7px;
-            font-weight: bold;
-            color: #111827;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-            background: #fff;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: #1976d2;
-            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.12);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        /* ==============================
-           PAGAMENTO
-        ============================== */
-
-        fieldset {
-            margin-top: 22px;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            padding: 15px;
-        }
-
-        legend {
-            padding: 0 8px;
-            font-weight: bold;
-            color: #111827;
-        }
-
-        .opcao-pagamento {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 12px 0;
-            font-weight: normal;
-            cursor: pointer;
-        }
-
-        .opcao-pagamento input {
-            width: auto;
-            cursor: pointer;
-        }
-
-        /* ==============================
-           BOTÕES
-        ============================== */
-
-        .btn-confirmar {
-            width: 100%;
-            margin-top: 25px;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: #1976d2;
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-confirmar:hover {
-            background: #1565c0;
-        }
-
-        .btn-confirmar:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .btn-voltar {
-            display: block;
-            width: 100%;
-            margin-top: 12px;
-            padding: 12px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 8px;
-            color: #1976d2;
-            font-weight: bold;
-        }
-
-        .btn-voltar:hover {
-            background: #eff6ff;
-        }
-
-        /* ==============================
-           MENSAGENS
-        ============================== */
-
-        .mensagem {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
-            font-weight: bold;
-        }
-
-        .mensagem.erro {
-            display: block;
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .mensagem.sucesso {
-            display: block;
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        /* ==============================
-           MOBILE
-        ============================== */
-
-        @media (max-width: 600px) {
-
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 20px 15px;
-            }
-
-            h1 {
-                font-size: 27px;
-            }
-
-            .item-pedido {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .item-preco {
-                align-self: flex-end;
-            }
-        }
-
-    </style>
+    <link
+        rel="stylesheet"
+        href="pagamento.css"
+    >
 
 </head>
 
 
 <body>
 
+    <!-- ======================================
+         PÁGINA DE PAGAMENTO
+    ======================================= -->
 
-    <main class="container">
+    <main class="pagina">
 
-        <h1>🧾 Finalizar pedido</h1>
+        <section class="card">
 
-        <p class="subtitulo">
-            Confira os itens e informe os dados para entrega.
-        </p>
+            <h1>
+                🧾 Finalizar pedido
+            </h1>
 
-
-        <!-- =====================================
-             RESUMO DO PEDIDO
-        ====================================== -->
-
-        <section
-            id="resumoPedido"
-            class="resumo-pedido"
-        >
 
             <p>
-                Carregando pedido...
+                Confira os itens e informe
+                os dados para entrega.
             </p>
 
-        </section>
 
-
-        <!-- =====================================
-             FORMULÁRIO
-        ====================================== -->
-
-        <form id="formPagamento">
-
-
-            <label for="nome">
-                Nome
-            </label>
-
-            <input
-                type="text"
-                id="nome"
-                name="nome"
-                required
-                autocomplete="name"
-            >
-
-
-            <label for="telefone">
-                Telefone
-            </label>
-
-            <input
-                type="tel"
-                id="telefone"
-                name="telefone"
-                required
-                autocomplete="tel"
-                placeholder="Ex.: (11) 99999-9999"
-            >
-
-
-            <label for="endereco">
-                Endereço
-            </label>
-
-            <input
-                type="text"
-                id="endereco"
-                name="endereco"
-                required
-                autocomplete="street-address"
-            >
-
-
-            <label for="numero">
-                Número
-            </label>
-
-            <input
-                type="text"
-                id="numero"
-                name="numero"
-                required
-            >
-
-
-            <label for="cidade">
-                Cidade
-            </label>
-
-            <input
-                type="text"
-                id="cidade"
-                name="cidade"
-                required
-                autocomplete="address-level2"
-            >
-
-
-            <!-- =================================
-                 OBSERVAÇÃO DO CLIENTE
-            ================================== -->
-
-            <label for="observacaoPedido">
-                📝 Observação do pedido
-            </label>
-
-            <textarea
-                id="observacaoPedido"
-                name="observacaoPedido"
-                rows="4"
-                placeholder="Ex.: Entregar depois das 18h, deixar na portaria, tocar a campainha..."
-            ></textarea>
-
-
-            <!-- =================================
-                 FORMA DE PAGAMENTO
-            ================================== -->
-
-            <fieldset>
-
-                <legend>
-                    Forma de pagamento
-                </legend>
-
-
-                <label class="opcao-pagamento">
-
-                    <input
-                        type="radio"
-                        name="pagamento"
-                        value="Pix"
-                        required
-                    >
-
-                    Pix
-
-                </label>
-
-
-                <label class="opcao-pagamento">
-
-                    <input
-                        type="radio"
-                        name="pagamento"
-                        value="Dinheiro"
-                    >
-
-                    Dinheiro
-
-                </label>
-
-
-                <label class="opcao-pagamento">
-
-                    <input
-                        type="radio"
-                        name="pagamento"
-                        value="Cartão"
-                    >
-
-                    Cartão
-
-                </label>
-
-            </fieldset>
-
+            <!-- ==================================
+                 RESUMO DO PEDIDO
+            =================================== -->
 
             <div
-                id="mensagem"
-                class="mensagem"
-            ></div>
-
-
-            <!-- =================================
-                 CONFIRMAR
-            ================================== -->
-
-            <button
-                type="submit"
-                id="btnConfirmar"
-                class="btn-confirmar"
+                id="resumoPedido"
+                class="resumo-pedido"
             >
-                ✅ Confirmar pedido
-            </button>
+            </div>
 
 
-        </form>
+            <!-- ==================================
+                 FORMULÁRIO
+            =================================== -->
+
+            <form
+                id="pagamentoForm"
+            >
+
+                <!-- NOME -->
+
+                <label for="nome">
+                    Nome
+                </label>
+
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    autocomplete="name"
+                    placeholder="Digite seu nome"
+                    required
+                >
 
 
-        <a
-            href="comprar.html"
-            class="btn-voltar"
-        >
-            ← Voltar para produtos
-        </a>
+                <!-- TELEFONE -->
 
+                <label for="telefone">
+                    Telefone
+                </label>
+
+                <input
+                    type="tel"
+                    id="telefone"
+                    name="telefone"
+                    autocomplete="tel"
+                    placeholder="(00) 00000-0000"
+                    required
+                >
+
+
+                <!-- ENDEREÇO -->
+
+                <label for="endereco">
+                    Endereço
+                </label>
+
+                <input
+                    type="text"
+                    id="endereco"
+                    name="endereco"
+                    autocomplete="street-address"
+                    placeholder="Rua / Avenida"
+                    required
+                >
+
+
+                <!-- NÚMERO -->
+
+                <label for="numero">
+                    Número
+                </label>
+
+                <input
+                    type="text"
+                    id="numero"
+                    name="numero"
+                    placeholder="Número"
+                    required
+                >
+
+
+                <!-- CIDADE -->
+
+                <label for="cidade">
+                    Cidade
+                </label>
+
+                <input
+                    type="text"
+                    id="cidade"
+                    name="cidade"
+                    autocomplete="address-level2"
+                    placeholder="Cidade"
+                    required
+                >
+
+
+                <!-- ==================================
+                     FORMA DE PAGAMENTO
+                =================================== -->
+
+                <fieldset>
+
+                    <legend>
+                        Forma de pagamento
+                    </legend>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="pagamento"
+                            value="Pix"
+                            required
+                        >
+
+                        Pix
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="pagamento"
+                            value="Dinheiro"
+                        >
+
+                        Dinheiro
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="pagamento"
+                            value="Cartão"
+                        >
+
+                        Cartão
+                    </label>
+
+                </fieldset>
+
+
+                <!-- ==================================
+                     BOTÃO
+                =================================== -->
+
+                <button
+                    type="submit"
+                >
+                    ✅ Confirmar pedido
+                </button>
+
+            </form>
+
+
+            <!-- ==================================
+                 VOLTAR
+            =================================== -->
+
+            <a
+                href="comprar.html"
+            >
+                ← Voltar para produtos
+            </a>
+
+        </section>
 
     </main>
 
 
-    <script src="pagamento.js"></script>
+    <!-- ======================================
+         JAVASCRIPT
+    ======================================= -->
+
+    <script
+        src="pagamento.js"
+    ></script>
 
 </body>
-<script src="admin.js"></script>
-<script src="relogio.js"></script>
-
-</body>
-</html>
-<body
-document.addEventListener("DOMContentLoaded", () => {
-
-    "use strict";
-
-    const tipoUsuario = localStorage.getItem("tipoUsuario");
-
-    console.log("Tipo de usuário:", tipoUsuario);
-    console.log("Nome:", localStorage.getItem("usuarioNome"));
-    console.log("Cliente:", localStorage.getItem("clienteNome"));
-
-    if (tipoUsuario !== "cliente") {
-        alert("Sessão de cliente não encontrada. Faça login novamente.");
-        window.location.href = "login.html";
-        return;
-    }
-
-});
 
 </html>

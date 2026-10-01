@@ -1,74 +1,158 @@
 // ==========================================
-// LOGIN.JS
-// LOJA SHALOM EMBALAGENS
+// LOGIN - LOJA SHALOM EMBALAGENS
 // ==========================================
 
-(function () {
+"use strict";
 
-    "use strict";
-
-
-    // ==========================================
-    // ELEMENTOS
-    // ==========================================
-
-    const loginForm =
-        document.getElementById("loginForm");
-
-    const emailInput =
-        document.getElementById("email");
-
-    const senhaInput =
-        document.getElementById("senha");
-
-    const mensagem =
-        document.getElementById("mensagem");
+const ADMIN_EMAIL = "admin@shalom.com";
+const ADMIN_SENHA = "123456";
 
 
-    if (!loginForm) {
-        return;
-    }
+// ==========================================
+// ELEMENTOS
+// ==========================================
+
+const form = document.getElementById("loginForm");
+const mensagem = document.getElementById("mensagem");
 
 
-    // ==========================================
-    // MENSAGEM
-    // ==========================================
+// ==========================================
+// MOSTRAR MENSAGEM
+// ==========================================
 
-    function mostrarMensagem(texto, tipo) {
+function mostrarMensagem(texto, tipo = "erro") {
 
-        if (!mensagem) {
+    if (!mensagem) return;
+
+    mensagem.textContent = texto;
+    mensagem.className = "mensagem " + tipo;
+}
+
+
+// ==========================================
+// LIMPAR SESSÃO ANTERIOR
+// ==========================================
+
+function limparSessao() {
+
+    localStorage.removeItem("tipoUsuario");
+    localStorage.removeItem("usuarioLogado");
+    localStorage.removeItem("usuarioNome");
+    localStorage.removeItem("nomeUsuario");
+    localStorage.removeItem("clienteNome");
+    localStorage.removeItem("clienteEmail");
+    localStorage.removeItem("usuarioAtual");
+}
+
+
+// ==========================================
+// LOGIN
+// ==========================================
+
+if (form) {
+
+    form.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const emailInput = document.getElementById("email");
+        const senhaInput = document.getElementById("senha");
+
+        const email = emailInput.value.trim().toLowerCase();
+        const senha = senhaInput.value;
+
+        // ------------------------------------------
+        // VALIDAÇÃO
+        // ------------------------------------------
+
+        if (!email || !senha) {
+
+            mostrarMensagem(
+                "Digite o e-mail e a senha.",
+                "erro"
+            );
+
             return;
         }
 
-        mensagem.textContent = texto;
 
-        mensagem.className =
-            "mensagem " + (tipo || "");
+        // ==========================================
+        // LOGIN DO ADMINISTRADOR
+        // ==========================================
 
-    }
+        if (
+            email === ADMIN_EMAIL &&
+            senha === ADMIN_SENHA
+        ) {
+
+            // Limpa qualquer login anterior
+            limparSessao();
 
 
-    // ==========================================
-    // PEGAR USUÁRIOS
-    // ==========================================
+            // Salva sessão de administrador
+            localStorage.setItem(
+                "tipoUsuario",
+                "admin"
+            );
 
-    function pegarUsuarios() {
+            localStorage.setItem(
+                "usuarioLogado",
+                "true"
+            );
+
+            localStorage.setItem(
+                "usuarioNome",
+                "Administrador"
+            );
+
+            localStorage.setItem(
+                "nomeUsuario",
+                "Administrador"
+            );
+
+            localStorage.setItem(
+                "clienteEmail",
+                ADMIN_EMAIL
+            );
+
+
+            localStorage.setItem(
+                "usuarioAtual",
+                JSON.stringify({
+                    id: "admin",
+                    nome: "Administrador",
+                    email: ADMIN_EMAIL,
+                    tipo: "admin"
+                })
+            );
+
+
+            // --------------------------------------
+            // ENTRA NO PAINEL
+            // --------------------------------------
+
+            window.location.replace("admin.html");
+
+            return;
+        }
+
+
+        // ==========================================
+        // LOGIN DO CLIENTE
+        // ==========================================
 
         let usuarios = [];
 
         try {
 
-            usuarios =
-                JSON.parse(
-                    localStorage.getItem(
-                        "usuariosShalom"
-                    )
-                ) || [];
+            usuarios = JSON.parse(
+                localStorage.getItem("usuariosShalom")
+            ) || [];
 
         } catch (erro) {
 
             console.error(
-                "Erro ao carregar usuários:",
+                "Erro ao ler usuariosShalom:",
                 erro
             );
 
@@ -76,236 +160,83 @@
         }
 
 
-        if (!Array.isArray(usuarios)) {
-            usuarios = [];
-        }
+        const usuario = usuarios.find(function (item) {
 
-
-        return usuarios;
-    }
-
-
-    // ==========================================
-    // LOGIN
-    // ==========================================
-
-    loginForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-
-            const email =
-                emailInput.value
+            return (
+                String(item.email || "")
                     .trim()
-                    .toLowerCase();
-
-
-            const senha =
-                senhaInput.value;
-
-
-            if (!email || !senha) {
-
-                mostrarMensagem(
-                    "Digite seu e-mail e sua senha.",
-                    "erro"
-                );
-
-                return;
-            }
-
-
-            // ======================================
-            // USUÁRIOS CADASTRADOS
-            // ======================================
-
-            const usuarios =
-                pegarUsuarios();
-
-
-            const usuario =
-                usuarios.find(function (item) {
-
-                    return String(
-                        item.email || ""
-                    )
-                        .trim()
-                        .toLowerCase() === email
-                        &&
-                        String(
-                            item.senha || ""
-                        ) === senha;
-
-                });
-
-
-            // ======================================
-            // ADMIN PADRÃO
-            // ======================================
-
-            let usuarioFinal =
-                usuario;
-
-
-            if (!usuarioFinal) {
-
-                if (
-                    email === "admin@shalom.com" &&
-                    senha === "123456"
-                ) {
-
-                    usuarioFinal = {
-
-                        id: "admin",
-
-                        nome: "Administrador",
-
-                        email: "admin@shalom.com",
-
-                        senha: "123456",
-
-                        tipo: "admin"
-
-                    };
-
-                }
-
-            }
-
-
-            // ======================================
-            // LOGIN INVÁLIDO
-            // ======================================
-
-            if (!usuarioFinal) {
-
-                mostrarMensagem(
-                    "E-mail ou senha incorretos.",
-                    "erro"
-                );
-
-                return;
-            }
-
-
-            // ======================================
-            // DEFINIR TIPO
-            // ======================================
-
-            let tipo =
-                String(
-                    usuarioFinal.tipo || ""
-                )
-                    .trim()
-                    .toLowerCase();
-
-
-            // Usuário antigo sem tipo
-            // será considerado cliente.
-
-            if (
-                tipo !== "admin" &&
-                tipo !== "cliente"
-            ) {
-
-                tipo = "cliente";
-
-            }
-
-
-            // ======================================
-            // SALVAR LOGIN
-            // ======================================
-
-            localStorage.setItem(
-                "tipoUsuario",
-                tipo
+                    .toLowerCase() === email
+                &&
+                String(item.senha || "") === senha
             );
 
-
-            localStorage.setItem(
-                "usuarioLogado",
-                "true"
-            );
+        });
 
 
-            localStorage.setItem(
-                "usuarioNome",
-                usuarioFinal.nome || "Cliente"
-            );
-
-
-            localStorage.setItem(
-                "nomeUsuario",
-                usuarioFinal.nome || "Cliente"
-            );
-
-
-            localStorage.setItem(
-                "clienteNome",
-                usuarioFinal.nome || "Cliente"
-            );
-
-
-            localStorage.setItem(
-                "clienteEmail",
-                usuarioFinal.email || email
-            );
-
-
-            // ======================================
-            // SALVAR DADOS COMPLETOS
-            // ======================================
-
-            localStorage.setItem(
-                "usuarioAtual",
-                JSON.stringify({
-
-                    id: usuarioFinal.id || "",
-
-                    nome:
-                        usuarioFinal.nome ||
-                        "Cliente",
-
-                    email:
-                        usuarioFinal.email ||
-                        email,
-
-                    tipo: tipo
-
-                })
-            );
-
-
-            // ======================================
-            // REDIRECIONAMENTO
-            // ======================================
+        if (!usuario) {
 
             mostrarMensagem(
-                "Login realizado com sucesso!",
-                "sucesso"
+                "E-mail ou senha incorretos.",
+                "erro"
             );
 
-
-            setTimeout(function () {
-
-                if (tipo === "admin") {
-
-                    window.location.href =
-                        "admin.html";
-
-                } else {
-
-                    window.location.href =
-                        "comprar.html";
-
-                }
-
-            }, 300);
-
+            return;
         }
-    );
 
-})();
+
+        // ------------------------------------------
+        // SALVA CLIENTE
+        // ------------------------------------------
+
+        limparSessao();
+
+        localStorage.setItem(
+            "tipoUsuario",
+            "cliente"
+        );
+
+        localStorage.setItem(
+            "usuarioLogado",
+            "true"
+        );
+
+        localStorage.setItem(
+            "usuarioNome",
+            usuario.nome || "Cliente"
+        );
+
+        localStorage.setItem(
+            "nomeUsuario",
+            usuario.nome || "Cliente"
+        );
+
+        localStorage.setItem(
+            "clienteNome",
+            usuario.nome || "Cliente"
+        );
+
+        localStorage.setItem(
+            "clienteEmail",
+            usuario.email || email
+        );
+
+        localStorage.setItem(
+            "usuarioAtual",
+            JSON.stringify({
+                id: usuario.id || Date.now().toString(),
+                nome: usuario.nome || "Cliente",
+                email: usuario.email || email,
+                tipo: "cliente"
+            })
+        );
+
+
+        // ------------------------------------------
+        // ENTRA NA LOJA
+        // ------------------------------------------
+
+        window.location.replace("comprar.html");
+
+    });
+
+}
